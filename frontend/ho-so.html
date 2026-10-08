@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ của bạn - StudyGroup</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/ho-so.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html">StudyGroup</a>
+            </div>
+            <nav class="nav">
+                <a href="index.html">Khám phá</a>
+                <a href="nhom-cua-ban.html">Nhóm của bạn</a>
+                <a href="ho-so.html" class="active">Hồ sơ</a>
+                <a href="danh-gia.html">Đánh giá</a>
+            </nav>
+            <div class="user-menu">
+                <img src="assets/images/avatar-default.png" alt="Avatar" class="avatar">
+                <span class="user-name">Nguyễn Văn An</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Page header -->
+        <div class="page-header">
+            <h1>Hồ sơ của bạn</h1>
+            <p class="page-subtitle">Quản lý thông tin cá nhân và học tập</p>
+        </div>
+
+        <!-- Layout 2 cột: Sidebar + Content -->
+        <div class="ho-so-layout">
+            <!-- SIDEBAR -->
+            <aside class="ho-so-sidebar">
+                <!-- Avatar card -->
+                <div class="profile-card">
+                    <div class="profile-avatar">
+                        <img src="assets/images/avatar-default.png" alt="Avatar" id="avatar-img">
+                        <button class="avatar-edit" onclick="doiAvatar()" title="Đổi ảnh đại diện">
+                            Đổi ảnh
+                        </button>
+                    </div>
+                    
+                    <h2 class="profile-name" id="profile-name">Nguyễn Văn An</h2>
+                    <p class="profile-mssv" id="profile-mssv">MSSV: 20210001</p>
+                    
+                    <div class="profile-status">
+                        <span class="status-dot"></span>
+                        Đang hoạt động
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="stat-nhom">3</div>
+                            <div class="stat-label">Nhóm tham gia</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="stat-uy-tin">4.8</div>
+                            <div class="stat-label">Điểm uy tín</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Menu sidebar -->
+                <nav class="sidebar-menu">
+                    <button class="sidebar-item active" data-section="thong-tin">
+                        Thông tin cá nhân
+                    </button>
+                    <button class="sidebar-item" data-section="hoc-tap">
+                        Học tập
+                    </button>
+                    <button class="sidebar-item" data-section="ky-nang">
+                        Kỹ năng
+                    </button>
+                    <button class="sidebar-item" data-section="bang-cap">
+                        Bằng cấp
+                    </button>
+                    <button class="sidebar-item" data-section="lich-ranh">
+                        Lịch rảnh
+                    </button>
+                    <button class="sidebar-item" data-section="bao-mat">
+                        Bảo mật
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- CONTENT -->
+            <div class="ho-so-content">
+                <!-- Section: Thông tin cá nhân -->
+                <section class="profile-section active" id="section-thong-tin">
+                    <div class="section-header">
+                        <h2>Thông tin cá nhân</h2>
+                        <button class="btn btn-secondary btn-sm" onclick="suaThongTin()">
+                            Chỉnh sửa
+                        </button>
+                    </div>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Họ và tên</label>
+                            <p id="info-hoten">Nguyễn Văn An</p>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Email</label>
+                            <p id="info-email">an@sv.edu.vn</p>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Số điện thoại</label>
+                            <p id="info-sdt">0912345678</p>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Mã số sinh viên</label>
+                            <p id="info-mssv">20210001</p>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Trường</label>
+                            <p id="info-truong">Đại học Bách Khoa Hà Nội</p>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Chuyên ngành</label>
+                            <p id="info-nganh">Công nghệ thông tin</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item full-width">
+                        <label>Giới thiệu bản thân</label>
+                        <p id="info-bio" class="bio-text">
+                            Mình là sinh viên năm 3 CNTT, đam mê AI và thích làm việc nhóm. 
+                            Đang tìm nhóm làm đồ án về Machine Learning.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Section: Học tập -->
+                <section class="profile-section" id="section-hoc-tap">
+                    <div class="section-header">
+                        <h2>Thông tin học tập</h2>
+                        <button class="btn btn-secondary btn-sm" onclick="suaHocTap()">
+                            Chỉnh sửa
+                        </button>
+                    </div>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Trình độ</label>
+                            <p id="info-trinhdo">Năm 3</p>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>GPA</label>
+                            <p id="info-gpa">3.5 / 4.0</p>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Niên khóa</label>
+                            <p id="info-nienkhoa">2021 - 2025</p>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label>Mục tiêu học tập</label>
+                            <p id="info-muctieu">Làm đồ án AI xuất sắc</p>
+                        </div>
+                    </div>
+                    
+                    <div class="section-sub">
+                        <h3>Môn học quan tâm</h3>
+                        <div class="tag-list" id="list-mon-hoc">
+                            <span class="tag">Trí tuệ nhân tạo</span>
+                            <span class="tag">Học máy</span>
+                            <span class="tag">Cơ sở dữ liệu</span>
+                        </div>
+                        <button class="btn-add" onclick="themMonHoc()">+ Thêm môn học</button>
+                    </div>
+                </section>
+
+                <!-- Section: Kỹ năng -->
+                <section class="profile-section" id="section-ky-nang">
+                    <div class="section-header">
+                        <h2>Kỹ năng</h2>
+                        <button class="btn btn-secondary btn-sm" onclick="themKyNang()">
+                            Thêm kỹ năng
+                        </button>
+                    </div>
+                    
+                    <div class="skills-list" id="list-ky-nang"></div>
+                </section>
+
+                <!-- Section: Bằng cấp -->
+                <section class="profile-section" id="section-bang-cap">
+                    <div class="section-header">
+                        <h2>Bằng cấp & Chứng chỉ</h2>
+                        <button class="btn btn-secondary btn-sm" onclick="themBangCap()">
+                            Thêm bằng cấp
+                        </button>
+                    </div>
+                    
+                    <div class="cert-list" id="list-bang-cap"></div>
+                </section>
+
+                <!-- Section: Lịch rảnh -->
+                <section class="profile-section" id="section-lich-ranh">
+                    <div class="section-header">
+                        <h2>Lịch rảnh của bạn</h2>
+                        <button class="btn btn-secondary btn-sm" onclick="suaLichRanh()">
+                            Chỉnh sửa
+                        </button>
+                    </div>
+                    
+                    <p class="section-desc">
+                        Chọn các khung giờ bạn rảnh để hệ thống gợi ý nhóm phù hợp.
+                    </p>
+                    
+                    <div class="schedule-grid" id="lich-ranh-grid"></div>
+                    
+                    <div class="schedule-legend">
+                        <div class="legend-item">
+                            <span class="legend-box available"></span>
+                            <span>Có thể họp</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-box busy"></span>
+                            <span>Bận</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section: Bảo mật -->
+                <section class="profile-section" id="section-bao-mat">
+                    <div class="section-header">
+                        <h2>Bảo mật tài khoản</h2>
+                    </div>
+                    
+                    <div class="security-list">
+                        <div class="security-item">
+                            <div>
+                                <h4>Đổi mật khẩu</h4>
+                                <p>Cập nhật mật khẩu mới cho tài khoản</p>
+                            </div>
+                            <button class="btn btn-secondary btn-sm" onclick="doiMatKhau()">
+                                Đổi
+                            </button>
+                        </div>
+                        
+                        <div class="security-item">
+                            <div>
+                                <h4>Xác thực email</h4>
+                                <p>Email đã được xác thực: an@sv.edu.vn</p>
+                            </div>
+                            <span class="security-badge">Đã xác thực</span>
+                        </div>
+                        
+                        <div class="security-item">
+                            <div>
+                                <h4>Lịch sử đăng nhập</h4>
+                                <p>Lần cuối: 06/10/2024 14:30</p>
+                            </div>
+                            <button class="btn btn-secondary btn-sm" onclick="xemLichSu()">
+                                Xem
+                            </button>
+                        </div>
+                        
+                        <div class="security-item">
+                            <div>
+                                <h4>Xóa tài khoản</h4>
+                                <p>Xóa vĩnh viễn tài khoản và toàn bộ dữ liệu</p>
+                            </div>
+                            <button class="btn btn-danger btn-sm" onclick="xoaTaiKhoan()">
+                                Xóa
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 StudyGroup. Hệ thống ghép nhóm học tập.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/ho-so.js"></script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khám phá - Ghép nhóm học tập</title>
+    
+    <!-- Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/kham_pha.css">
+    <link rel="stylesheet" href="css/book-modal.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html">StudyGroup</a>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="active">Khám phá</a>
+                <a href="nhom-cua-ban.html">Nhóm của bạn</a>
+                <a href="ho-so.html">Hồ sơ</a>
+                <a href="danh-gia.html">Đánh giá</a>
+            </nav>
+            <div class="user-menu">
+                <img src="assets/images/avatar-default.png" alt="Avatar" class="avatar">
+                <span class="user-name">Nguyễn Văn An</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Hero -->
+        <section class="hero">
+            <h1>Tìm nhóm học tập phù hợp</h1>
+            <p>Ghép nhóm thông minh dựa trên môn học, lịch rảnh và mục tiêu của bạn</p>
+        </section>
+
+        <!-- Filters -->
+        <section class="filters">
+            <div class="filter-row">
+                <div class="form-group">
+                    <label class="form-label">Loại nhóm</label>
+                    <select class="form-select" id="filter-loai-nhom">
+                        <option value="">Tất cả</option>
+                        <option value="HOC_MON">Học nhóm môn học</option>
+                        <option value="CLB_HOC_THUAT">Câu lạc bộ học thuật</option>
+                        <option value="DU_AN_CA_NHAN">Dự án cá nhân</option>
+                        <option value="NGHIEN_CUU">Nghiên cứu khoa học</option>
+                        <option value="DO_AN_MON">Đồ án môn học</option>
+                        <option value="ON_THI">Ôn thi</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Môn học</label>
+                    <select class="form-select" id="filter-mon-hoc">
+                        <option value="">Tất cả</option>
+                        <option value="1">Nhập môn lập trình</option>
+                        <option value="2">Kỹ thuật lập trình</option>
+                        <option value="3">Lập trình hướng đối tượng</option>
+                        <option value="5">Trí tuệ nhân tạo</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Lĩnh vực</label>
+                    <input type="text" class="form-input" id="filter-linh-vuc" 
+                           placeholder="VD: AI, Web...">
+                </div>
+
+                <button class="btn btn-primary" id="btn-tim-kiem">
+                    🔍 Tìm nhóm
+                </button>
+            </div>
+        </section>
+
+        <!-- Results -->
+        <section class="results">
+            <div class="results-header">
+                <h2>Kết quả tìm kiếm</h2>
+                <span class="results-count" id="results-count">0 nhóm</span>
+            </div>
+
+            <div class="group-list" id="group-list"></div>
+
+            <div class="empty-state" id="empty-state" style="display: none;">
+                <div class="empty-icon">🔍</div>
+                <p>Không tìm thấy nhóm phù hợp</p>
+                <p>Thử đổi bộ lọc hoặc từ khóa khác</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 StudyGroup. Hệ thống ghép nhóm học tập.</p>
+        </div>
+    </footer>
+
+    <!-- MODAL SÁCH -->
+    <div class="book-modal" id="book-modal" style="display: none;">
+        <div class="book-backdrop" onclick="closeBook()"></div>
+        
+        <div class="book-container" id="book-container">
+            <div class="book-spine"></div>
+            <div class="book-bookmark"></div>
+            
+            <div class="book" id="book">
+                <!-- Trang trái -->
+                <div class="book-page book-page-left">
+                    <div class="book-page-content">
+                        <div class="book-icon">📖</div>
+                        <h2 class="book-title" id="book-title">Nhóm AI</h2>
+                        <div class="book-type" id="book-type">Đồ án môn học</div>
+                        
+                        <div class="book-divider"></div>
+                        
+                        <div class="book-section">
+                            <h3>📝 Mô tả</h3>
+                            <p id="book-desc">Nhóm làm đồ án môn Trí tuệ nhân tạo...</p>
+                        </div>
+                        
+                        <div class="book-section">
+                            <h3>📚 Môn học</h3>
+                            <p id="book-mon-hoc">Trí tuệ nhân tạo</p>
+                        </div>
+                        
+                        <div class="book-section">
+                            <h3>💡 Đề tài</h3>
+                            <p id="book-de-tai">Chatbot tư vấn tuyển sinh</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Trang phải -->
+                <div class="book-page book-page-right">
+                    <div class="book-page-content">
+                        <div class="book-section">
+                            <h3>👥 Thành viên (<span id="book-member-count">3/5</span>)</h3>
+                            <div class="book-members" id="book-members"></div>
+                        </div>
+                        
+                        <div class="book-section">
+                            <h3>🎯 Điểm tương thích</h3>
+                            <div class="book-score">
+                                <span class="book-score-value" id="book-score">92%</span>
+                                <div class="book-score-bar">
+                                    <div class="book-score-fill" id="book-score-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="book-actions">
+                            <button class="btn btn-primary" onclick="guiYeuCauTuBook()">
+                                📩 Xin vào nhóm
+                            </button>
+                            <button class="btn btn-secondary" onclick="closeBook()">
+                                Đóng sách
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/kham_pha.js"></script>
+</body>
+</html>

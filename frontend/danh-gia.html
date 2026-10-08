@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đánh giá thành viên - StudyGroup</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/danh-gia.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html">StudyGroup</a>
+            </div>
+            <nav class="nav">
+                <a href="index.html">Khám phá</a>
+                <a href="nhom-cua-ban.html">Nhóm của bạn</a>
+                <a href="ho-so.html">Hồ sơ</a>
+                <a href="danh-gia.html" class="active">Đánh giá</a>
+            </nav>
+            <div class="user-menu">
+                <img src="assets/images/avatar-default.png" alt="Avatar" class="avatar">
+                <span class="user-name">Nguyễn Văn An</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Page header -->
+        <div class="page-header">
+            <h1>Đánh giá thành viên</h1>
+            <p class="page-subtitle">Đánh giá chéo sau khi nhóm hoàn thành mục tiêu</p>
+        </div>
+
+        <!-- Nhóm cần đánh giá -->
+        <div id="list-nhom-danh-gia"></div>
+
+        <!-- Empty state -->
+        <div class="empty-state-page" id="empty-state-page" style="display: none;">
+            <div class="empty-icon">📋</div>
+            <h2>Không có nhóm nào cần đánh giá</h2>
+            <p>Khi nhóm bạn hoàn thành mục tiêu, hệ thống sẽ mở đợt đánh giá tại đây.</p>
+            <a href="nhom-cua-ban.html" class="btn btn-primary">
+                Xem nhóm của bạn
+            </a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 StudyGroup. Hệ thống ghép nhóm học tập.</p>
+        </div>
+    </footer>
+
+    <!-- =====================================================
+         MODAL ĐÁNH GIÁ
+         ===================================================== -->
+    <div class="modal-overlay" id="modal-danh-gia" style="display: none;">
+        <div class="modal-backdrop" onclick="closeModal()"></div>
+        
+        <div class="modal-container">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">Đánh giá thành viên</h2>
+                    <p class="modal-subtitle" id="modal-ten-nguoi-duoc-dg">Đánh giá: Lê Văn Cường</p>
+                </div>
+                <button class="modal-close" onclick="closeModal()" title="Đóng">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Thông tin người được đánh giá -->
+                <div class="danh-gia-nguoi">
+                    <img src="assets/images/avatar-default.png" 
+                         alt="Avatar" 
+                         class="danh-gia-avatar">
+                    <div class="danh-gia-nguoi-info">
+                        <div class="danh-gia-nguoi-name" id="modal-nguoi-name">Lê Văn Cường</div>
+                        <div class="danh-gia-nguoi-role" id="modal-nguoi-role">Thành viên</div>
+                    </div>
+                </div>
+
+                <!-- Các tiêu chí đánh giá -->
+                <div class="danh-gia-form">
+                    <!-- Tiêu chí 1: Thái độ -->
+                    <div class="tieu-chi-item">
+                        <div class="tieu-chi-header">
+                            <label class="tieu-chi-label">Thái độ</label>
+                            <span class="tieu-chi-desc">Tinh thần, thái độ khi làm việc nhóm</span>
+                        </div>
+                        <div class="star-rating" data-tieu-chi="thai-do">
+                            <button type="button" class="star" data-value="1">★</button>
+                            <button type="button" class="star" data-value="2">★</button>
+                            <button type="button" class="star" data-value="3">★</button>
+                            <button type="button" class="star" data-value="4">★</button>
+                            <button type="button" class="star" data-value="5">★</button>
+                        </div>
+                    </div>
+
+                    <!-- Tiêu chí 2: Đóng góp -->
+                    <div class="tieu-chi-item">
+                        <div class="tieu-chi-header">
+                            <label class="tieu-chi-label">Mức độ đóng góp</label>
+                            <span class="tieu-chi-desc">Khối lượng và chất lượng công việc</span>
+                        </div>
+                        <div class="star-rating" data-tieu-chi="dong-gop">
+                            <button type="button" class="star" data-value="1">★</button>
+                            <button type="button" class="star" data-value="2">★</button>
+                            <button type="button" class="star" data-value="3">★</button>
+                            <button type="button" class="star" data-value="4">★</button>
+                            <button type="button" class="star" data-value="5">★</button>
+                        </div>
+                    </div>
+
+                    <!-- Tiêu chí 3: Giao tiếp -->
+                    <div class="tieu-chi-item">
+                        <div class="tieu-chi-header">
+                            <label class="tieu-chi-label">Giao tiếp</label>
+                            <span class="tieu-chi-desc">Khả năng phối hợp và trao đổi</span>
+                        </div>
+                        <div class="star-rating" data-tieu-chi="giao-tiep">
+                            <button type="button" class="star" data-value="1">★</button>
+                            <button type="button" class="star" data-value="2">★</button>
+                            <button type="button" class="star" data-value="3">★</button>
+                            <button type="button" class="star" data-value="4">★</button>
+                            <button type="button" class="star" data-value="5">★</button>
+                        </div>
+                    </div>
+
+                    <!-- Tiêu chí 4: Đúng hạn -->
+                    <div class="tieu-chi-item">
+                        <div class="tieu-chi-header">
+                            <label class="tieu-chi-label">Đúng hạn</label>
+                            <span class="tieu-chi-desc">Tuân thủ deadline đã đề ra</span>
+                        </div>
+                        <div class="star-rating" data-tieu-chi="dung-han">
+                            <button type="button" class="star" data-value="1">★</button>
+                            <button type="button" class="star" data-value="2">★</button>
+                            <button type="button" class="star" data-value="3">★</button>
+                            <button type="button" class="star" data-value="4">★</button>
+                            <button type="button" class="star" data-value="5">★</button>
+                        </div>
+                    </div>
+
+                    <!-- Nhận xét -->
+                    <div class="tieu-chi-item">
+                        <div class="tieu-chi-header">
+                            <label class="tieu-chi-label">Nhận xét</label>
+                            <span class="tieu-chi-desc">Chia sẻ thêm về quá trình làm việc (tùy chọn)</span>
+                        </div>
+                        <textarea 
+                            class="form-textarea" 
+                            id="nhan-xet"
+                            placeholder="Viết nhận xét của bạn về thành viên này..."
+                            rows="4"
+                            maxlength="500"></textarea>
+                        <div class="char-count">
+                            <span id="char-count">0</span>/500
+                        </div>
+                    </div>
+
+                    <!-- Ẩn danh -->
+                    <div class="an-danh-wrapper">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="an-danh" checked>
+                            <span class="checkbox-text">
+                                Ẩn danh người đánh giá
+                                <small>Người được đánh giá sẽ không biết bạn là ai</small>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">
+                    Hủy
+                </button>
+                <button class="btn btn-primary" id="btn-gui-danh-gia" onclick="guiDanhGia()">
+                    Gửi đánh giá
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/danh-gia.js"></script>
+</body>
+</html>

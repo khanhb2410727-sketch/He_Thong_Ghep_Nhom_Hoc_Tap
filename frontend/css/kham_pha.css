@@ -1,0 +1,367 @@
+/* =====================================================
+   TRANG KHÁM PHÁ - Cozy Reading Nook
+   ===================================================== */
+
+/* Hero */
+.hero {
+    text-align: center;
+    padding: var(--space-12) 0 var(--space-8);
+}
+
+.hero h1 {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin-bottom: var(--space-3);
+    font-family: 'Georgia', serif;
+}
+
+.hero h1::before {
+    content: "📖 ";
+    font-size: 32px;
+}
+
+.hero p {
+    color: var(--text-secondary);
+    font-size: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+    font-style: italic;
+}
+
+/* Filters */
+.filters {
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-sm);
+    border: 2px solid var(--border-light);
+    margin-bottom: var(--space-6);
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: var(--space-4);
+    align-items: end;
+}
+
+/* Results */
+.results {
+    margin-top: var(--space-6);
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-4);
+    border-bottom: 2px dashed var(--border-light);
+}
+
+.results-header h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+    font-family: 'Georgia', serif;
+}
+
+.results-header h2::before {
+    content: "🕯️ ";
+    margin-right: 4px;
+}
+
+.results-count {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px 16px;
+    background: var(--bg-subtle);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-light);
+}
+
+/* =====================================================
+   GRID 3 CỘT
+   ===================================================== */
+.group-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-5);
+}
+
+/* =====================================================
+   GROUP CARD
+   ===================================================== */
+.group-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-sm);
+    border: 2px solid var(--border-light);
+    transition: all var(--transition-base);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    min-height: 340px;
+}
+
+.group-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, 
+        var(--primary) 0%, 
+        var(--secondary) 100%);
+}
+
+.group-card:hover {
+    box-shadow: var(--shadow-md),
+                0 0 32px rgba(245, 216, 154, 0.15);
+    transform: translateY(-4px);
+    border-color: var(--secondary);
+}
+
+/* Icon sách góc trên phải */
+.group-book-icon {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, 
+        var(--pastel-honey-bg) 0%, 
+        var(--bg-candle) 100%);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--border);
+    box-shadow: 0 2px 8px rgba(74, 56, 38, 0.1);
+    transition: all var(--transition-base);
+    z-index: 2;
+}
+
+.book-icon-anim {
+    font-size: 24px;
+    transition: transform var(--transition-base);
+    display: inline-block;
+}
+
+.group-card:hover .group-book-icon {
+    background: linear-gradient(135deg, 
+        var(--pastel-honey-bg) 0%, 
+        var(--secondary) 100%);
+    box-shadow: 0 4px 16px rgba(232, 185, 109, 0.4);
+    transform: scale(1.1) rotate(-5deg);
+}
+
+.group-card:hover .book-icon-anim {
+    animation: bookWiggle 0.6s ease-in-out;
+}
+
+@keyframes bookWiggle {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-10deg) scale(1.15); }
+    75% { transform: rotate(10deg) scale(1.15); }
+}
+
+/* Header */
+.group-card-header {
+    padding-right: 60px;
+    margin-bottom: var(--space-2);
+}
+
+.group-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+    font-family: 'Georgia', serif;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.group-type {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--primary);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 3px 10px;
+    background: var(--primary-light);
+    border-radius: var(--radius-full);
+}
+
+/* Mô tả */
+.group-desc {
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.6;
+    font-style: italic;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Meta */
+.group-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: var(--space-2);
+}
+
+.group-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: var(--bg-warm);
+    color: var(--text-secondary);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 12px;
+    border: 1px solid var(--border-light);
+}
+
+/* Điểm tương thích */
+.match-score {
+    text-align: center;
+    padding: var(--space-3);
+    background: linear-gradient(135deg, 
+        var(--pastel-honey-bg) 0%, 
+        var(--bg-candle) 100%);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(232, 185, 109, 0.4);
+    box-shadow: 0 0 20px rgba(245, 216, 154, 0.3);
+    position: relative;
+    margin-top: auto;
+}
+
+.match-score::before {
+    content: "🕯️";
+    position: absolute;
+    top: -10px;
+    left: 12px;              /* ← Góc trái */
+    font-size: 16px;
+    background: var(--bg-card);
+    padding: 0 6px;
+    border-radius: var(--radius-full);
+    transform: none;
+}
+
+.match-score-value {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--pastel-honey-text);
+    font-family: 'Georgia', serif;
+}
+
+.match-score-label {
+    font-size: 10px;
+    color: var(--pastel-honey-text);
+    margin-top: 6px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.match-score-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(232, 185, 109, 0.25);
+    border-radius: var(--radius-full);
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.match-score-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width var(--transition-slow);
+    box-shadow: 0 0 8px currentColor;
+}
+
+/* Nút */
+.group-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: var(--space-2);
+}
+
+.group-actions .btn {
+    flex: 1;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: var(--space-16) var(--space-5);
+    color: var(--text-secondary);
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    border: 2px dashed var(--border);
+}
+
+.empty-state .empty-icon {
+    font-size: 64px;
+    margin-bottom: var(--space-4);
+    opacity: 0.8;
+}
+
+.empty-state p:first-of-type {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-family: 'Georgia', serif;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 1024px) {
+    .group-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .filter-row {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .filter-row .btn {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 640px) {
+    .group-list {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+    }
+    
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .group-card {
+        min-height: auto;
+    }
+}

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhóm của bạn - StudyGroup</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/nhom.css">
+    <link rel="stylesheet" href="css/book-modal.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html">StudyGroup</a>
+            </div>
+            <nav class="nav">
+                <a href="index.html">Khám phá</a>
+                <a href="nhom-cua-ban.html" class="active">Nhóm của bạn</a>
+                <a href="ho-so.html">Hồ sơ</a>
+                <a href="danh-gia.html">Đánh giá</a>
+            </nav>
+            <div class="user-menu">
+                <img src="assets/images/avatar-default.png" alt="Avatar" class="avatar">
+                <span class="user-name">Nguyễn Văn An</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Page header -->
+        <div class="page-header">
+            <div>
+                <h1>Nhóm của bạn</h1>
+                <p class="page-subtitle">Quản lý các nhóm học tập của bạn</p>
+            </div>
+            <button class="btn btn-primary" onclick="taoNhomMoi()">
+                ➕ Tạo nhóm mới
+            </button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="dang-tham-gia">
+                <span class="tab-icon">👥</span>
+                Đang tham gia
+                <span class="tab-count" id="count-dang-tham-gia">2</span>
+            </button>
+            <button class="tab" data-tab="da-tao">
+                <span class="tab-icon"></span>
+                Đã tạo
+                <span class="tab-count" id="count-da-tao">1</span>
+            </button>
+            <button class="tab" data-tab="loi-moi">
+                <span class="tab-icon"></span>
+                Lời mời
+                <span class="tab-count badge-fire" id="count-loi-moi">2</span>
+            </button>
+            <button class="tab" data-tab="yeu-cau">
+                <span class="tab-icon"></span>
+                Yêu cầu đã gửi
+                <span class="tab-count" id="count-yeu-cau">1</span>
+            </button>
+        </div>
+
+        <!-- TAB 1: Đang tham gia -->
+        <div class="tab-content" id="tab-dang-tham-gia">
+            <div class="nhom-list" id="list-dang-tham-gia"></div>
+            <div class="empty-tab" id="empty-dang-tham-gia" style="display: none;">
+                <div class="empty-icon">👥</div>
+                <p>Bạn chưa tham gia nhóm nào</p>
+                <a href="index.html" class="btn btn-primary" style="margin-top: 16px;">
+                    🔍 Khám phá nhóm
+                </a>
+            </div>
+        </div>
+
+        <!-- TAB 2: Đã tạo -->
+        <div class="tab-content" id="tab-da-tao" style="display: none;">
+            <div class="nhom-list" id="list-da-tao"></div>
+            <div class="empty-tab" id="empty-da-tao" style="display: none;">
+                <div class="empty-icon"></div>
+                <p>Bạn chưa tạo nhóm nào</p>
+                <button class="btn btn-primary" onclick="taoNhomMoi()" style="margin-top: 16px;">
+                    ➕ Tạo nhóm mới
+                </button>
+            </div>
+        </div>
+
+        <!-- TAB 3: Lời mời -->
+        <div class="tab-content" id="tab-loi-moi" style="display: none;">
+            <div class="nhom-list" id="list-loi-moi"></div>
+            <div class="empty-tab" id="empty-loi-moi" style="display: none;">
+                <div class="empty-icon"></div>
+                <p>Không có lời mời nào</p>
+            </div>
+        </div>
+
+        <!-- TAB 4: Yêu cầu đã gửi -->
+        <div class="tab-content" id="tab-yeu-cau" style="display: none;">
+            <div class="nhom-list" id="list-yeu-cau"></div>
+            <div class="empty-tab" id="empty-yeu-cau" style="display: none;">
+                <div class="empty-icon"></div>
+                <p>Bạn chưa gửi yêu cầu nào</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 StudyGroup. Hệ thống ghép nhóm học tập.</p>
+        </div>
+    </footer>
+
+    <!-- MODAL SÁCH -->
+    <div class="book-modal" id="book-modal" style="display: none;">
+        <div class="book-backdrop" onclick="closeBook()"></div>
+        
+        <div class="book-container" id="book-container">
+            <div class="book-spine"></div>
+            <div class="book-bookmark"></div>
+            
+            <div class="book" id="book">
+                <div class="book-page book-page-left">
+                    <div class="book-page-content">
+                        <div class="book-icon">📖</div>
+                        <h2 class="book-title" id="book-title">Nhóm AI</h2>
+                        <div class="book-type" id="book-type">Đồ án môn học</div>
+                        
+                        <div class="book-divider"></div>
+                        
+                        <div class="book-section">
+                            <h3>Mô tả</h3>
+                            <p id="book-desc">...</p>
+                        </div>
+                        
+                        <div class="book-section">
+                            <h3>Môn học</h3>
+                            <p id="book-mon-hoc">...</p>
+                        </div>
+                        
+                        <div class="book-section">
+                            <h3>Đề tài</h3>
+                            <p id="book-de-tai">...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="book-page book-page-right">
+                    <div class="book-page-content">
+                        <div class="book-section">
+                            <h3>Thành viên (<span id="book-member-count">3/5</span>)</h3>
+                            <div class="book-members" id="book-members"></div>
+                        </div>
+                        
+                        <div class="book-section">
+                            <h3>Trạng thái</h3>
+                            <div id="book-status"></div>
+                        </div>
+                        
+                        <div class="book-actions" id="book-actions"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/nhom.js"></script>
+</body>
+</html>
