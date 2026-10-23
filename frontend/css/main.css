@@ -397,3 +397,63 @@ a:hover {
 code, pre, kbd, samp {
     font-family: 'Courier New', Consolas, Monaco, monospace !important;
 }
+/* =====================================================
+   TOAST NOTIFICATION (Thông báo nổi)
+   ===================================================== */
+.toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.toast {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    padding: 16px 20px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    border-left: 4px solid var(--primary);
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 280px;
+    animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.toast.success {
+    border-left-color: #7A9160; /* Xanh rêu */
+    background: #F4F7F2;
+    color: #4A5B38;
+}
+
+.toast.error {
+    border-left-color: #B85045; /* Đỏ gạch */
+    background: #FDF4F3;
+    color: #8B3A30;
+}
+
+.toast.fade-out {
+    animation: fadeOutRight 0.3s ease forwards;
+}
+
+@keyframes slideInRight {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOutRight {
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}

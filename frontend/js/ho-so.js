@@ -1,236 +1,312 @@
-// ============================================
-// TRANG HỒ SƠ CÁ NHÂN
-// ============================================
+let lichRanhBit = "000000000000000000000"; 
+const thuMap = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'];
+const caMap = ['Sáng', 'Chiều', 'Tối'];
+let selectedKyNang = [];
+let selectedSoThich = [];
 
-// MOCK DATA
-const MOCK_MON_HOC = [
-    { maMonHoc: 1, tenMonHoc: 'Trí tuệ nhân tạo', maCode: 'INT3401', mucDo: 5 },
-    { maMonHoc: 2, tenMonHoc: 'Học máy', maCode: 'INT3403', mucDo: 4 },
-    { maMonHoc: 3, tenMonHoc: 'Cơ sở dữ liệu', maCode: 'INT2211', mucDo: 4 },
-    { maMonHoc: 4, tenMonHoc: 'Cấu trúc dữ liệu', maCode: 'INT2210', mucDo: 5 }
-];
-
-const MOCK_KY_NANG = {
-    'Lập trình': [
-        { ten: 'Python', trinhDo: 'kha' },
-        { ten: 'Java', trinhDo: 'co_ban' },
-        { ten: 'SQL', trinhDo: 'kha' },
-        { ten: 'JavaScript', trinhDo: 'co_ban' }
-    ],
-    'Dữ liệu & AI': [
-        { ten: 'Pandas', trinhDo: 'kha' },
-        { ten: 'Scikit-learn', trinhDo: 'co_ban' },
-        { ten: 'TensorFlow', trinhDo: 'moi_bat_dau' }
-    ],
-    'Kỹ năng mềm': [
-        { ten: 'Làm việc nhóm', trinhDo: 'kha' },
-        { ten: 'Thuyết trình', trinhDo: 'co_ban' }
-    ],
-    'Ngoại ngữ': [
-        { ten: 'Tiếng Anh (IELTS 7.0)', trinhDo: 'kha' }
-    ]
-};
-
-const MOCK_BANG_CAP = [
-    {
-        ten: 'IELTS Academic',
-        toChuc: 'British Council',
-        diem: '7.0',
-        ngayCap: '15/03/2024',
-        daXacThuc: true
-    },
-    {
-        ten: 'AWS Cloud Practitioner',
-        toChuc: 'Amazon Web Services',
-        diem: 'Pass',
-        ngayCap: '20/06/2024',
-        daXacThuc: true
-    },
-    {
-        ten: 'Giải Nhì Olympic Tin học',
-        toChuc: 'Đại học Bách Khoa',
-        diem: '—',
-        ngayCap: '10/11/2023',
-        daXacThuc: false
-    }
-];
-
-// Lịch rảnh (true = rảnh)
-let lichRanh = {
-    '2-0': true,  // T2 sáng
-    '2-2': true,  // T2 tối
-    '4-0': true,  // T4 sáng
-    '4-2': true,  // T4 tối
-    '6-0': true,  // T6 sáng
-};
-
-// ============================================
-// INIT
-// ============================================
-
-document.addEventListener('DOMContentLoaded', () => {
-    setupTabs();
-    renderMonHoc();
-    renderKyNang();
-    renderBangCap();
-    renderLichRanh();
+document.addEventListener('DOMContentLoaded', async () => {
+    if (!localStorage.getItem('token')) { window.location.href = 'dang-nhap.html'; return; }
+    setupTabs(); 
+    tuDongTaoNienKhoa();
+    await loadHoSo(); 
+    await loadLichRanh();
 });
 
 function setupTabs() {
     const tabs = document.querySelectorAll('.tab');
-    
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            const tabName = tab.dataset.tab;
-            
-            tabs.forEach(t => t.classList.remove('active'));
+            tabs.forEach(t => t.classList.remove('active')); 
             tab.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
             
-            document.querySelectorAll('.tab-content').forEach(c => {
-                c.style.display = 'none';
-            });
+            const content = document.getElementById(`tab-${tab.dataset.tab}`);
+            if (content) content.style.display = 'block';
             
-            const content = document.getElementById(`tab-${tabName}`);
-            if (content) {
-                content.style.display = 'block';
-                content.style.animation = 'none';
-                content.offsetHeight;
-                content.style.animation = 'fadeInUp 0.3s ease';
-            }
+            if (tab.dataset.tab === 'ky-nang') loadKyNang();
+            if (tab.dataset.tab === 'so-thich') loadSoThich();
+            if (tab.dataset.tab === 'bang-cap') loadBangCap();
         });
     });
 }
 
-// ============================================
-// RENDER MÔN HỌC
-// ============================================
-
-function renderMonHoc() {
-    const list = document.getElementById('list-mon-hoc');
+// Hàm tạo danh sách Niên khóa tự động (Từ K40 đến K65)
+function tuDongTaoNienKhoa() {
+    const select = document.getElementById('input-nien-khoa');
+    if (!select) return;
     
-    list.innerHTML = MOCK_MON_HOC.map(mh => {
-        const dots = Array.from({ length: 5 }, (_, i) => 
-            `<span class="level-dot ${i < mh.mucDo ? 'filled' : ''}"></span>`
-        ).join('');
-        
-        return `
-            <div class="mon-hoc-item">
-                <div class="mon-hoc-info">
-                    <div class="mon-hoc-name">${mh.tenMonHoc}</div>
-                    <div class="mon-hoc-code">${mh.maCode}</div>
-                </div>
-                <div class="mon-hoc-level">
-                    <div class="level-bar">${dots}</div>
-                    <div class="level-text">Mức độ ${mh.mucDo}/5</div>
-                </div>
-            </div>
-        `;
-    }).join('');
+    // Xóa các option cũ (nếu có) trước khi thêm mới
+    select.innerHTML = '<option value="">-- Chọn niên khóa --</option>';
+    
+    for (let i = 65; i >= 40; i--) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `Khóa ${i} (K${i})`;
+        select.appendChild(option);
+    }
 }
 
-// ============================================
-// RENDER KỸ NĂNG
-// ============================================
+async function loadHoSo() {
+    try {
+        const data = await apiCall('/sinh-vien/ho-so', { method: 'GET' });
+        
+        const nienKhoaText = data.nien_khoa && data.nien_khoa > 0 ? `K${data.nien_khoa}` : 'Chưa cập nhật';
+        
+        document.getElementById('header-ho-ten').textContent = data.ho_ten;
+        document.getElementById('header-subtitle').textContent = data.chuyen_nganh || 'Chưa cập nhật ngành';
+        if (data.anh_dai_dien) document.getElementById('header-avatar').src = data.anh_dai_dien;
+        
+        // Cập nhật phần View
+        document.getElementById('view-ma-sv').textContent = data.mssv || 'Chưa cập nhật';
+        document.getElementById('view-email').textContent = data.email;
+        document.getElementById('view-chuyen-nganh').textContent = data.chuyen_nganh || 'Chưa cập nhật';
+        document.getElementById('view-nien-khoa').textContent = nienKhoaText;
+        document.getElementById('view-lop-sinh-hoat').textContent = data.lop_sinh_hoat || 'Chưa cập nhật';
+        document.getElementById('view-bio').textContent = data.mo_ta_ban_than || 'Chưa có giới thiệu.';
 
-function renderKyNang() {
-    const container = document.getElementById('list-ky-nang');
-    
-    const levelText = {
-        'moi_bat_dau': 'Mới bắt đầu',
-        'co_ban': 'Cơ bản',
-        'kha': 'Khá',
-        'chuyen_gia': 'Chuyên gia'
+        // Cập nhật phần Edit Form
+        document.getElementById('input-chuyen-nganh').value = data.chuyen_nganh || '';
+        document.getElementById('input-nien-khoa').value = data.nien_khoa || '';
+        document.getElementById('input-lop-sinh-hoat').value = data.lop_sinh_hoat || '';
+        document.getElementById('input-gpa').value = data.gpa || '';
+        document.getElementById('input-bio').value = data.mo_ta_ban_than || '';
+    } catch (err) { showToast('Lỗi tải hồ sơ!', 'error'); }
+}
+
+function suaHoSo() { 
+    document.getElementById('tab-thong-tin').style.display = 'none'; 
+    document.getElementById('edit-form').style.display = 'block'; 
+    document.getElementById('btn-sua-ho-so').style.display = 'none'; 
+}
+
+function huyChinhSua() { 
+    document.getElementById('edit-form').style.display = 'none'; 
+    document.getElementById('tab-thong-tin').style.display = 'block'; 
+    document.getElementById('btn-sua-ho-so').style.display = 'block'; 
+}
+
+async function luuHoSo() {
+    const payload = {
+        chuyen_nganh: document.getElementById('input-chuyen-nganh').value,
+        nien_khoa: parseInt(document.getElementById('input-nien-khoa').value) || 0,
+        lop_sinh_hoat: document.getElementById('input-lop-sinh-hoat').value.trim(),
+        gpa: parseFloat(document.getElementById('input-gpa').value) || 0,
+        mo_ta_ban_than: document.getElementById('input-bio').value.trim(),
+        muc_tieu_hoc_tap: ""
     };
     
-    container.innerHTML = Object.entries(MOCK_KY_NANG).map(([nhom, list]) => `
-        <div class="ky-nang-group">
-            <h3 class="ky-nang-group-title">${nhom}</h3>
-            <div class="ky-nang-list">
-                ${list.map(kn => `
-                    <span class="ky-nang-tag ${kn.trinhDo === 'kha' || kn.trinhDo === 'chuyen_gia' ? 'level-cao' : ''}">
-                        ${kn.ten}
-                        <span class="ky-nang-level">${levelText[kn.trinhDo]}</span>
-                    </span>
-                `).join('')}
-            </div>
-        </div>
-    `).join('');
+    try {
+        await apiCall('/sinh-vien/ho-so', { method: 'PUT', body: JSON.stringify(payload) });
+        showToast('Cập nhật thành công!', 'success'); 
+        await loadHoSo(); 
+        huyChinhSua();
+    } catch (err) { showToast('Lỗi khi lưu!', 'error'); }
 }
 
-// ============================================
-// RENDER BẰNG CẤP
-// ============================================
-
-function renderBangCap() {
-    const list = document.getElementById('list-bang-cap');
-    
-    list.innerHTML = MOCK_BANG_CAP.map(bc => `
-        <div class="bang-cap-item ${bc.daXacThuc ? 'verified' : ''}">
-            <div class="bang-cap-name">${bc.ten}</div>
-            <div class="bang-cap-org">${bc.toChuc}</div>
-            <div class="bang-cap-details">
-                <span class="bang-cap-score">${bc.diem}</span>
-                <span class="bang-cap-date">Cấp ngày ${bc.ngayCap}</span>
-            </div>
-        </div>
-    `).join('');
-}
-
-// ============================================
-// RENDER LỊCH RẢNH
-// ============================================
-
-function renderLichRanh() {
-    const grid = document.getElementById('lich-ranh-grid');
-    const thuList = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
-    const caList = ['Sáng', 'Chiều', 'Tối'];
-    
-    let html = '<div class="lich-ranh-header"></div>';
-    
-    thuList.forEach(thu => {
-        html += `<div class="lich-ranh-header">${thu}</div>`;
+async function uploadAvatar(input) {
+    if (!input.files || input.files.length === 0) return;
+    const formData = new FormData(); formData.append("file", input.files[0]);
+    const res = await fetch(`${API_BASE}/tai-khoan/avatar`, { 
+        method: 'POST', 
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }, 
+        body: formData 
     });
-    
-    caList.forEach((ca, caIndex) => {
-        html += `<div class="lich-ranh-ca-label">${ca}</div>`;
+    const data = await res.json();
+    if (res.ok) { 
+        document.getElementById('header-avatar').src = data.avatar_url; 
+        showToast('Cập nhật ảnh!', 'success'); 
+    }
+}
+
+// ==========================================
+// KỸ NĂNG
+// ==========================================
+async function loadKyNang() {
+    const container = document.getElementById('list-ky-nang');
+    container.innerHTML = '<p>Đang tải...</p>';
+    try {
+        const allKn = await apiCall('/danh-muc/ky-nang', { method: 'GET' });
+        const myKn = await apiCall('/sinh-vien/ky-nang', { method: 'GET' });
+        selectedKyNang = myKn.danhSach || [];
         
-        thuList.forEach((thu, thuIndex) => {
-            const key = `${thuIndex + 2}-${caIndex}`;
-            const isAvailable = lichRanh[key] || false;
-            
-            html += `
-                <div class="lich-ranh-cell ${isAvailable ? 'available' : ''}" 
-                     onclick="toggleLichRanh('${key}')">
-                </div>
-            `;
-        });
-    });
+        if (allKn.length === 0) {
+            container.innerHTML = '<p style="color: red;">Danh mục kỹ năng trống.</p>';
+            return;
+        }
+        
+        container.innerHTML = `
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+                ${allKn.map(kn => `<button class="btn ${selectedKyNang.includes(kn.ma_ky_nang) ? 'btn-primary' : 'btn-secondary'}" onclick="toggleKyNang(${kn.ma_ky_nang})">${selectedKyNang.includes(kn.ma_ky_nang) ? '✓ ' : '+ '}${kn.ten_ky_nang}</button>`).join('')}
+            </div>
+            <button class="btn btn-primary" onclick="luuKyNang()">Lưu Kỹ năng</button>
+        `;
+    } catch (err) { container.innerHTML = '<p style="color: red;">Lỗi tải kỹ năng!</p>'; }
+}
+
+function toggleKyNang(id) { 
+    if (selectedKyNang.includes(id)) selectedKyNang = selectedKyNang.filter(x => x !== id); 
+    else selectedKyNang.push(id); 
+    loadKyNang(); 
+}
+
+async function luuKyNang() { 
+    try { 
+        await apiCall('/sinh-vien/ky-nang', { method: 'POST', body: JSON.stringify({ danh_sach_ma: selectedKyNang }) }); 
+        showToast('Đã lưu kỹ năng!', 'success'); 
+    } catch (err) { showToast('Lỗi lưu kỹ năng!', 'error'); } 
+}
+
+// ==========================================
+// SỞ THÍCH
+// ==========================================
+async function loadSoThich() {
+    const container = document.getElementById('list-so-thich');
+    container.innerHTML = '<p>Đang tải...</p>';
+    try {
+        const allSt = await apiCall('/danh-muc/so-thich', { method: 'GET' });
+        const mySt = await apiCall('/sinh-vien/so-thich', { method: 'GET' });
+        selectedSoThich = mySt.danhSach || [];
+        
+        if (allSt.length === 0) {
+            container.innerHTML = '<p style="color: red;">Danh mục sở thích trống.</p>';
+            return;
+        }
+        
+        container.innerHTML = `
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+                ${allSt.map(st => `<button class="btn ${selectedSoThich.includes(st.ma_so_thich) ? 'btn-primary' : 'btn-secondary'}" onclick="toggleSoThich(${st.ma_so_thich})">${selectedSoThich.includes(st.ma_so_thich) ? '✓ ' : '+ '}${st.ten_so_thich}</button>`).join('')}
+            </div>
+            <button class="btn btn-primary" onclick="luuSoThich()">Lưu Sở thích</button>
+        `;
+    } catch (err) { container.innerHTML = '<p style="color: red;">Lỗi tải sở thích!</p>'; }
+}
+
+function toggleSoThich(id) { 
+    if (selectedSoThich.includes(id)) selectedSoThich = selectedSoThich.filter(x => x !== id); 
+    else selectedSoThich.push(id); 
+    loadSoThich(); 
+}
+
+async function luuSoThich() { 
+    try { 
+        await apiCall('/sinh-vien/so-thich', { method: 'POST', body: JSON.stringify({ danh_sach_ma: selectedSoThich }) }); 
+        showToast('Đã lưu sở thích!', 'success'); 
+    } catch (err) { showToast('Lỗi lưu sở thích!', 'error'); } 
+}
+
+// ==========================================
+// BẰNG CẤP
+// ==========================================
+async function loadBangCap() {
+    const container = document.getElementById('list-bang-cap');
+    container.innerHTML = '<p style="color: var(--text-muted); font-style: italic; grid-column: 1/-1;">Đang tải...</p>';
     
+    try {
+        const data = await apiCall('/sinh-vien/bang-cap', { method: 'GET' });
+        
+        if (!data.danhSach || data.danhSach.length === 0) { 
+            container.innerHTML = '<p style="color: var(--text-muted); font-style: italic; grid-column: 1/-1;">Chưa có bằng cấp nào. Hãy bấm "+ Thêm bằng cấp".</p>'; 
+            return; 
+        }
+        
+        container.innerHTML = data.danhSach.map(bc => `
+            <div style="background: var(--bg-main); border: 2px solid var(--border-light); padding: 16px; border-radius: 12px;">
+                <h4 style="font-size: 16px; margin-bottom: 8px; color: var(--text-primary);">${bc.ten_bang_cap}</h4>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Loại: ${bc.loai}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 14px;">
+                    <span style="font-weight: 800; color: var(--secondary-dark);">${bc.diem_so || '—'}</span>
+                    <span style="color: var(--text-muted);">Cấp ngày: ${bc.ngay_cap}</span>
+                </div>
+            </div>
+        `).join('');
+    } catch (err) { 
+        container.innerHTML = '<p style="color: red; grid-column: 1/-1;">Lỗi tải dữ liệu bằng cấp!</p>'; 
+    }
+}
+
+async function moModalBangCap() {
+    const select = document.getElementById('select-bang-cap');
+    select.innerHTML = '<option value="">Đang tải...</option>';
+    document.getElementById('modal-bang-cap').style.display = 'flex';
+    
+    try { 
+        const data = await apiCall('/danh-muc/bang-cap', { method: 'GET' }); 
+        if (data.length === 0) {
+            select.innerHTML = '<option value="">Danh mục trống (Chạy SQL nạp dữ liệu)</option>';
+            return;
+        }
+        select.innerHTML = data.map(bc => `<option value="${bc.ma_loai_bang_cap}">${bc.ten_bang_cap}</option>`).join(''); 
+    } catch (err) { 
+        select.innerHTML = '<option value="">Lỗi tải danh mục</option>'; 
+    }
+}
+
+async function luuBangCap() {
+    const ma_loai = document.getElementById('select-bang-cap').value; 
+    const diem_so = document.getElementById('input-diem-bc').value; 
+    const ngay_cap = document.getElementById('input-ngay-bc').value;
+    
+    if(!ma_loai) { showToast('Vui lòng chọn loại bằng cấp!', 'error'); return; }
+    if(!ngay_cap) { showToast('Vui lòng chọn ngày cấp!', 'error'); return; }
+    
+    try { 
+        await apiCall('/sinh-vien/bang-cap', { 
+            method: 'POST', 
+            body: JSON.stringify({ ma_loai_bang_cap: parseInt(ma_loai), diem_so, ngay_cap }) 
+        }); 
+        showToast('Thêm bằng cấp thành công!', 'success'); 
+        dongModal('modal-bang-cap'); 
+        loadBangCap(); 
+    } catch (err) { 
+        showToast('Lỗi khi thêm bằng cấp!', 'error'); 
+    }
+}
+
+function dongModal(id) { 
+    document.getElementById(id).style.display = 'none'; 
+}
+
+// ==========================================
+// LỊCH RẢNH
+// ==========================================
+async function loadLichRanh() { 
+    try { 
+        const data = await apiCall('/lich-ranh', { method: 'GET' }); 
+        lichRanhBit = data.lich_ranh_bit || "000000000000000000000"; 
+        renderLichRanhGrid(); 
+    } catch (err) { console.error(err); } 
+}
+
+function renderLichRanhGrid() {
+    const grid = document.getElementById('lich-ranh-grid'); 
+    if (!grid) return;
+    
+    let html = '<div style="font-weight: 600; color: var(--text-secondary); padding: 10px;"></div>';
+    thuMap.forEach(thu => { html += `<div style="font-weight: 600; color: var(--text-secondary); padding: 10px; font-size: 14px;">${thu}</div>`; });
+    
+    for (let caIndex = 0; caIndex < 3; caIndex++) {
+        html += `<div style="font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; justify-content: flex-end; padding-right: 12px;">${caMap[caIndex]}</div>`;
+        for (let thuIndex = 0; thuIndex < 7; thuIndex++) {
+            const bitIndex = thuIndex * 3 + caIndex; 
+            const isAvailable = lichRanhBit[bitIndex] === '1';
+            html += `<div class="lich-cell ${isAvailable ? 'active' : ''}" onclick="toggleLichCell(${bitIndex})" style="padding: 16px; background: ${isAvailable ? 'var(--pastel-sage-bg)' : 'var(--bg-hover)'}; border: 2px solid ${isAvailable ? 'var(--primary)' : 'transparent'}; border-radius: 8px; cursor: pointer; transition: all 0.2s;">${isAvailable ? 'Rảnh' : 'Bận'}</div>`;
+        }
+    }
     grid.innerHTML = html;
 }
 
-function toggleLichRanh(key) {
-    lichRanh[key] = !lichRanh[key];
-    renderLichRanh();
+function toggleLichCell(bitIndex) { 
+    let arr = lichRanhBit.split(''); 
+    arr[bitIndex] = arr[bitIndex] === '1' ? '0' : '1'; 
+    lichRanhBit = arr.join(''); 
+    renderLichRanhGrid(); 
 }
 
-function luuLichRanh() {
-    // Chuyển thành chuỗi bit
-    const bitString = Array.from({ length: 21 }, (_, i) => {
-        const thu = Math.floor(i / 3) + 2;
-        const ca = i % 3;
-        const key = `${thu}-${ca}`;
-        return lichRanh[key] ? '1' : '0';
-    }).join('');
-    
-    console.log('Lịch rảnh bit:', bitString);
-    alert(`Đã lưu lịch rảnh!\nChuỗi bit: ${bitString}`);
-}
-
-// ============================================
-// ACTIONS
-// ============================================
-
-function suaHoSo() {
-    alert('Chức năng chỉnh sửa hồ sơ đang phát triển');
+async function luuLichRanh() { 
+    try { 
+        const data = await apiCall('/lich-ranh', { method: 'PUT', body: JSON.stringify({ lich_ranh_bit: lichRanhBit }) }); 
+        showToast(data.message || 'Đã lưu lịch rảnh!', 'success'); 
+    } catch (err) { 
+        showToast('Lỗi khi lưu lịch rảnh!', 'error'); 
+    } 
 }
