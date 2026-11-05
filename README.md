@@ -1,8 +1,6 @@
 # Hệ thống ghép nhóm học tập StudyGroup
 
-Đồ án môn học: [Điền tên môn học]
 Sinh viên thực hiện: Phan Duy Khánh - B2410727
-Lớp: [Điền tên lớp]
 
 ## Giới thiệu
 Đây là hệ thống giúp sinh viên tìm kiếm và ghép nhóm học tập. Hệ thống sẽ tự động tính điểm tương thích dựa trên lịch rảnh, kỹ năng, GPA, điểm uy tín và sở thích để gợi ý những nhóm phù hợp nhất.
@@ -33,9 +31,9 @@ Backend sẽ chạy ở cổng 8000.
 
 Bước 3: Chạy Frontend
 - Mở thư mục frontend.
-- Chạy file index.html (khuyên dùng Live Server trên VSCode).
+- Chạy file index.html (Dùng Live Server trên VSCode).
 
-## Tài khoản test (dành cho giảng viên)
+## Tài khoản test
 Dùng các tài khoản này để test tính năng phân quyền:
 
 Quản trị viên:
