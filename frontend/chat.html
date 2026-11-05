@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Nhóm - StudyGroup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        body { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        .chat-layout { flex: 1; display: flex; max-width: 900px; margin: 0 auto; width: 100%; padding: 20px; height: calc(100vh - 72px); }
+        
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; }
+        .chat-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border-light); background: var(--bg-main); }
+        .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+        
+        .msg-wrapper { display: flex; gap: 10px; align-items: flex-end; max-width: 80%; }
+        .msg-wrapper.mine { align-self: flex-end; flex-direction: row-reverse; }
+        .msg-wrapper.other { align-self: flex-start; }
+        .msg-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); flex-shrink: 0; }
+        .msg-content { display: flex; flex-direction: column; }
+        .msg-wrapper.mine .msg-content { align-items: flex-end; }
+        .msg-wrapper.other .msg-content { align-items: flex-start; }
+        .msg-bubble { padding: 10px 16px; border-radius: 16px; font-size: 15px; line-height: 1.5; word-break: break-word; }
+        .msg-wrapper.mine .msg-bubble { background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+        .msg-wrapper.other .msg-bubble { background: var(--bg-hover); color: var(--text-primary); border-bottom-left-radius: 4px; }
+        .msg-info { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; margin-left: 4px; margin-right: 4px; }
+
+        .chat-input-area { display: flex; gap: 12px; padding: 16px 20px; border-top: 1px solid var(--border-light); background: var(--bg-main); }
+        .chat-input { flex: 1; padding: 12px 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-full); color: var(--text-primary); outline: none; }
+        .chat-input:focus { border-color: var(--primary); }
+
+        /* CSS CHO MODAL & TABS */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-container { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-xl); width: 100%; max-width: 600px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.5); animation: modalFadeIn 0.3s ease; }
+        @keyframes modalFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-header { padding: 24px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { font-size: 20px; font-weight: 700; }
+        .modal-close { background: transparent; border: none; color: var(--text-secondary); font-size: 24px; cursor: pointer; }
+        .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+        .modal-footer { padding: 20px 24px; border-top: 1px solid var(--border-light); display: flex; justify-content: flex-end; gap: 12px; background: var(--bg-main); border-bottom-left-radius: var(--radius-xl); border-bottom-right-radius: var(--radius-xl); }
+        
+        .tab-btn { padding: 12px 20px; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-size: 15px; font-weight: 600; cursor: pointer; }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        .task-item { background: var(--bg-main); border: 1px solid var(--border-light); border-left: 4px solid var(--primary); border-radius: var(--radius-md); padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;}
+        .task-item.done { opacity: 0.6; border-left-color: var(--secondary); }
+        .task-title { font-weight: 600; color: var(--text-primary); margin-bottom: 4px; font-size: 15px; }
+        .task-time { font-size: 13px; color: var(--text-secondary); }
+
+        input[type="date"] { color-scheme: dark; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo"><a href="index.html">StudyGroup</a></div>
+            <nav class="nav">
+                <a href="index.html">Khám phá</a>
+                <a href="nhom-cua-ban.html">Nhóm của bạn</a>
+                <a href="ho-so.html">Hồ sơ</a>
+                <a href="danh-gia.html">Đánh giá</a>
+            </nav>
+            <div id="user-menu"></div>
+        </div>
+    </header>
+
+    <main class="chat-layout">
+        <div class="chat-main">
+            <div class="chat-header">
+                <button class="btn btn-secondary btn-sm" onclick="window.location.href='nhom-cua-ban.html'">← Quay lại</button>
+                <h2 id="chat-ten-nhom" style="font-size: 18px; font-weight: 700;">Đang tải...</h2>
+                <button class="btn btn-primary btn-sm" onclick="openActivityModal()">Hoạt động nhóm</button>
+            </div>
+            <div class="chat-box" id="chat-box"></div>
+            <form class="chat-input-area" id="chat-form">
+                <input type="text" class="chat-input" id="chat-input" placeholder="Nhập tin nhắn..." autocomplete="off">
+                <button type="submit" class="btn btn-primary" style="border-radius: var(--radius-full);">Gửi</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- MODAL HOẠT ĐỘNG NHÓM -->
+    <div class="modal-overlay" id="activity-modal" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>Hoạt động nhóm</h2>
+                <button class="modal-close" onclick="closeActivityModal()">&times;</button>
+            </div>
+            
+            <!-- THANH TABS -->
+            <div style="display: flex; padding: 0 24px; background: var(--bg-card); border-bottom: 1px solid var(--border-light);">
+                <button class="tab-btn active" id="tab-calendar" onclick="switchActivityTab('calendar')">Lịch họp</button>
+                <button class="tab-btn" id="tab-deadline" onclick="switchActivityTab('deadline')">Deadline</button>
+                <button class="tab-btn" id="tab-lich-ranh" onclick="switchActivityTab('lich-ranh')">Lịch rảnh chung</button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- NỘI DUNG LỊCH HỌP -->
+                <div id="content-calendar">
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                        <button class="btn btn-primary btn-sm" onclick="moModalTaoLich()">+ Tạo lịch họp</button>
+                    </div>
+                    <div id="list-lich-hop"></div>
+                </div>
+                
+                <!-- NỘI DUNG DEADLINE -->
+                <div id="content-deadline" style="display: none;">
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                        <button class="btn btn-primary btn-sm" onclick="moModalTaoDeadline()">+ Thêm Deadline</button>
+                    </div>
+                    <div id="list-deadline"></div>
+                </div>
+
+                <!-- NỘI DUNG LỊCH RẢNH CHUNG -->
+                <div id="content-lich-ranh" style="display: none;">
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">Màu xanh đậm là lúc mọi người cùng rảnh. Bạn có thể dựa vào đây để chốt lịch họp.</p>
+                    <div style="display: grid; grid-template-columns: 70px repeat(7, 1fr); gap: 8px; text-align: center;" id="grid-lich-ranh">
+                        <!-- JS sẽ render vào đây -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TẠO LỊCH HỌP -->
+    <div class="modal-overlay" id="modal-tao-lich" style="display: none; z-index: 1100;">
+        <div class="modal-container" style="max-width: 500px;">
+            <div class="modal-header"><h2>Tạo Lịch Họp Mới</h2><button class="modal-close" onclick="closeModalTaoLich()">&times;</button></div>
+            <div class="modal-body">
+                <div class="form-group" style="margin-bottom: 12px;"><label class="form-label">Tiêu đề cuộc họp *</label><input type="text" class="form-input" id="lich-tieu-de" placeholder="VD: Họp bàn kế hoạch đồ án"></div>
+                <div class="form-group" style="margin-bottom: 12px;"><label class="form-label">Ngày họp *</label><input type="date" class="form-input" id="lich-ngay"></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div class="form-group"><label class="form-label">Giờ bắt đầu *</label><input type="text" class="form-input" id="lich-gio-bat-dau" placeholder="VD: 07:30"></div>
+                    <div class="form-group"><label class="form-label">Giờ kết thúc *</label><input type="text" class="form-input" id="lich-gio-ket-thuc" placeholder="VD: 09:00"></div>
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;"><label class="form-label">Địa điểm</label><input type="text" class="form-input" id="lich-dia-diem" placeholder="VD: Thư viện..."></div>
+                <div class="form-group"><label class="form-label">Nội dung / Ghi chú</label><textarea class="form-textarea" id="lich-noi-dung" rows="2"></textarea></div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModalTaoLich()">Hủy</button><button class="btn btn-primary" onclick="xuLyTaoLich()">Lưu lịch họp</button></div>
+        </div>
+    </div>
+
+    <!-- MODAL TẠO DEADLINE -->
+    <div class="modal-overlay" id="modal-tao-deadline" style="display: none; z-index: 1100;">
+        <div class="modal-container" style="max-width: 500px;">
+            <div class="modal-header"><h2>Tạo Deadline Mới</h2><button class="modal-close" onclick="closeModalTaoDeadline()">&times;</button></div>
+            <div class="modal-body">
+                <div class="form-group" style="margin-bottom: 12px;"><label class="form-label">Tên công việc *</label><input type="text" class="form-input" id="dl-tieu-de" placeholder="VD: Nộp báo cáo tuần 1"></div>
+                <div class="form-group" style="margin-bottom: 12px;"><label class="form-label">Ngày hết hạn *</label><input type="date" class="form-input" id="dl-ngay"></div>
+                <div class="form-group" style="margin-bottom: 12px;"><label class="form-label">Giờ hết hạn *</label><input type="text" class="form-input" id="dl-gio" placeholder="VD: 17:00"></div>
+                <div class="form-group"><label class="form-label">Mô tả chi tiết</label><textarea class="form-textarea" id="dl-mo-ta" rows="3"></textarea></div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModalTaoDeadline()">Hủy</button><button class="btn btn-primary" onclick="xuLyTaoDeadline()">Lưu Deadline</button></div>
+        </div>
+    </div>
+
+    <!-- MODAL XEM HỒ SƠ THÀNH VIÊN TỪ CHAT -->
+    <div id="modal-xem-ho-so-chat" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: var(--bg-card); border-radius: var(--radius-xl); width: 100%; max-width: 600px; max-height: 90vh; display: flex; flex-direction: column; border: 1px solid var(--border-light); box-shadow: var(--shadow-lg);">
+            
+            <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary);">Hồ sơ thành viên</h2>
+                <button onclick="dongModalXemHoSoChat()" style="background: transparent; border: none; color: var(--text-secondary); font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+
+            <div style="padding: 24px; overflow-y: auto; flex: 1;" id="noi-dung-ho-so-chat">
+                <!-- Nội dung JS sẽ render vào đây -->
+            </div>
+
+            <div style="padding: 16px 24px; border-top: 1px solid var(--border-light); display: flex; justify-content: flex-end; background: var(--bg-main); border-bottom-left-radius: var(--radius-xl); border-bottom-right-radius: var(--radius-xl);">
+                <button class="btn btn-secondary" onclick="dongModalXemHoSoChat()">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/chat.js"></script>
+</body>
+</html>

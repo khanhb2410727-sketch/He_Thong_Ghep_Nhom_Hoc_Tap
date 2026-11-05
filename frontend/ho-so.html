@@ -32,30 +32,42 @@
             <div class="profile-info">
                 <h1 class="profile-name" id="header-ho-ten">Đang tải...</h1>
                 <p class="profile-subtitle" id="header-subtitle">Sinh viên</p>
-                <div class="profile-trust">
-                    <span class="trust-score-value">5.0</span>
-                    <span class="trust-score-label">Điểm uy tín</span>
+                
+                <div style="margin-top: 12px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 6px 14px; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; color: var(--primary);">
+                        MSSV: <span id="header-mssv">---</span>
+                    </div>
+                    <div class="profile-trust" style="background: var(--bg-card); border: 1px solid var(--border); padding: 6px 14px; border-radius: var(--radius-md); display: inline-flex; align-items: center; gap: 8px;">
+                        <span class="trust-score-value" id="header-uy-tin" style="color: #F59E0B; font-weight: 800; font-size: 16px; line-height: 1;">5.0</span>
+                        <span class="trust-score-label" style="color: var(--text-secondary); font-size: 13px; font-weight: 600; line-height: 1;">Điểm uy tín</span>
+                    </div>
                 </div>
-            </div>
-            <div class="profile-actions">
-                <button class="btn btn-secondary" id="btn-sua-ho-so" onclick="suaHoSo()">Chỉnh sửa</button>
             </div>
         </section>
 
+        <!-- THANH TABS (ĐÃ THÊM TAB HỖ TRỢ) -->
         <div class="tabs">
             <button class="tab active" data-tab="thong-tin">Thông tin</button>
             <button class="tab" data-tab="ky-nang">Kỹ năng</button>
             <button class="tab" data-tab="so-thich">Sở thích</button>
             <button class="tab" data-tab="bang-cap">Bằng cấp</button>
             <button class="tab" data-tab="lich-ranh">Lịch rảnh</button>
+            <button class="tab" data-tab="lich-su">Lịch sử nhóm</button>
+            <button class="tab" data-tab="ho-tro">Hỗ trợ</button>
         </div>
 
-        <!-- TAB XEM THÔNG TIN -->
+        <!-- TAB THÔNG TIN -->
         <div class="tab-content" id="tab-thong-tin">
+            <div style="display: flex; justify-content: flex-end; margin-bottom: var(--space-4);">
+                <button class="btn btn-secondary" id="btn-sua-ho-so" onclick="suaHoSo()">Chỉnh sửa thông tin</button>
+            </div>
             <div class="info-grid">
                 <div class="info-card">
-                    <h3 class="info-card-title">Thông tin cá nhân</h3>
-                    <div class="info-row"><span class="info-label">Mã sinh viên</span><span class="info-value" id="view-ma-sv">...</span></div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 12px;">
+                        <h3 class="info-card-title" style="border: none; padding: 0; margin: 0;">Thông tin cá nhân</h3>
+                        <button class="btn btn-secondary btn-sm" onclick="moModalDoiMatKhau()">Đổi mật khẩu</button>
+                    </div>
+                    <div class="info-row"><span class="info-label">Mã sinh viên</span><span class="info-value" id="view-mssv" style="color: var(--primary); font-weight: bold;">...</span></div>
                     <div class="info-row"><span class="info-label">Email</span><span class="info-value" id="view-email">...</span></div>
                 </div>
                 <div class="info-card">
@@ -74,22 +86,28 @@
         <!-- FORM CHỈNH SỬA -->
         <div class="info-card info-card-full" id="edit-form" style="display: none; margin-top: var(--space-5);">
             <h3 class="info-card-title">Chỉnh sửa Hồ sơ</h3>
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label">Mã sinh viên (Không thể thay đổi)</label>
+                <input type="text" class="form-input" id="input-mssv" readonly style="background: var(--bg-hover); cursor: not-allowed;">
+            </div>
             <div class="info-grid" style="margin-top: var(--space-4);">
                 <div class="form-group">
                     <label class="form-label">Chuyên ngành</label>
                     <select class="form-select" id="input-chuyen-nganh">
                         <option value="">-- Chọn chuyên ngành --</option>
+                        <option value="Công nghệ thông tin">Công nghệ thông tin</option>
                         <option value="Kỹ thuật phần mềm">Kỹ thuật phần mềm</option>
                         <option value="Hệ thống thông tin">Hệ thống thông tin</option>
                         <option value="Khoa học máy tính">Khoa học máy tính</option>
+                        <option value="Mạng máy tính và truyền thông dữ liệu">Mạng máy tính và truyền thông dữ liệu</option>
                         <option value="An toàn thông tin">An toàn thông tin</option>
+                        <option value="Trí tuệ nhân tạo">Trí tuệ nhân tạo</option>
+                        <option value="Truyền thông đa phương tiện">Truyền thông đa phương tiện</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Niên khóa</label>
-                    <select class="form-select" id="input-nien-khoa">
-                        <option value="">-- Chọn niên khóa --</option>
-                    </select>
+                    <select class="form-select" id="input-nien-khoa"><option value="">-- Chọn niên khóa --</option></select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Lớp sinh hoạt</label>
@@ -110,60 +128,85 @@
             </div>
         </div>
 
-        <div class="tab-content" id="tab-ky-nang" style="display: none;">
+        <!-- CÁC TAB KHÁC -->
+        <div class="tab-content" id="tab-ky-nang" style="display: none;"><div class="info-card info-card-full"><h3 class="info-card-title" style="margin-bottom: var(--space-4);">Kỹ năng Lập trình & Ngoại ngữ</h3><div id="list-ky-nang"></div></div></div>
+        <div class="tab-content" id="tab-so-thich" style="display: none;"><div class="info-card info-card-full"><h3 class="info-card-title" style="margin-bottom: var(--space-4);">Sở thích cá nhân</h3><div id="list-so-thich"></div></div></div>
+        <div class="tab-content" id="tab-bang-cap" style="display: none;"><div class="info-card info-card-full"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);"><h3 class="info-card-title" style="margin-bottom: 0; border: none; padding: 0;">Bằng cấp & Chứng chỉ</h3><button class="btn btn-primary btn-sm" onclick="moModalBangCap()">+ Thêm bằng cấp</button></div><div id="list-bang-cap" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px;"></div></div></div>
+        <div class="tab-content" id="tab-lich-ranh" style="display: none;"><div class="info-card info-card-full"><h3 class="info-card-title">Lịch rảnh của bạn</h3><div class="lich-ranh-grid" id="lich-ranh-grid" style="display: grid; grid-template-columns: 80px repeat(7, 1fr); gap: 8px; text-align: center; margin-bottom: 16px;"></div></div></div>
+
+        <!-- TAB LỊCH SỬ NHÓM -->
+        <div class="tab-content" id="tab-lich-su" style="display: none;">
             <div class="info-card info-card-full">
-                <h3 class="info-card-title" style="margin-bottom: var(--space-4);">Kỹ năng Lập trình & Ngoại ngữ</h3>
-                <div id="list-ky-nang"></div>
+                <h3 class="info-card-title" style="margin-bottom: var(--space-4);">Lịch sử tham gia nhóm</h3>
+                <div id="list-lich-su-nhom" style="display: flex; flex-direction: column; gap: 16px;"></div>
             </div>
         </div>
 
-        <div class="tab-content" id="tab-so-thich" style="display: none;">
+        <!-- TAB LỊCH SỬ HỖ TRỢ (MỚI THÊM) -->
+        <div class="tab-content" id="tab-ho-tro" style="display: none;">
             <div class="info-card info-card-full">
-                <h3 class="info-card-title" style="margin-bottom: var(--space-4);">Sở thích cá nhân</h3>
-                <div id="list-so-thich"></div>
-            </div>
-        </div>
-
-        <div class="tab-content" id="tab-bang-cap" style="display: none;">
-            <div class="info-card info-card-full">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
-                    <h3 class="info-card-title" style="margin-bottom: 0; border: none; padding: 0;">Bằng cấp & Chứng chỉ</h3>
-                    <button class="btn btn-primary btn-sm" onclick="moModalBangCap()">+ Thêm bằng cấp</button>
-                </div>
-                <div id="list-bang-cap" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px;"></div>
-            </div>
-        </div>
-
-        <div class="tab-content" id="tab-lich-ranh" style="display: none;">
-            <div class="info-card info-card-full">
-                <h3 class="info-card-title">Lịch rảnh của bạn</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 16px;">Click vào các ô để chọn thời gian bạn rảnh.</p>
-                <div class="lich-ranh-grid" id="lich-ranh-grid" style="display: grid; grid-template-columns: 80px repeat(7, 1fr); gap: 8px; text-align: center; margin-bottom: 24px;"></div>
-                <div style="display: flex; justify-content: flex-end;">
-                    <button class="btn btn-primary" onclick="luuLichRanh()">Lưu lịch rảnh</button>
-                </div>
+                <h3 class="info-card-title" style="margin-bottom: var(--space-4);">Lịch sử Yêu cầu Hỗ trợ</h3>
+                <div id="list-ho-tro-cua-toi" style="display: flex; flex-direction: column; gap: 16px;"></div>
             </div>
         </div>
     </main>
 
+    <!-- MODAL THÊM BẰNG CẤP -->
     <div id="modal-bang-cap" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
         <div style="background: var(--bg-card); padding: 24px; border-radius: var(--radius-xl); width: 100%; max-width: 400px;">
             <h3 style="margin-bottom: 16px; color: var(--text-primary);">Thêm Bằng cấp</h3>
-            <div class="form-group" style="margin-bottom: 12px;">
-                <label class="form-label">Loại bằng cấp</label>
-                <select class="form-select" id="select-bang-cap"></select>
+            <div class="form-group" style="margin-bottom: 12px;"><label class="form-label">Loại bằng cấp</label><select class="form-select" id="select-bang-cap"></select></div>
+            <div class="form-group" style="margin-bottom: 12px;"><label class="form-label">Điểm số / Xếp loại</label><input type="text" class="form-input" id="input-diem-bc" placeholder="VD: 7.0"></div>
+            <div class="form-group" style="margin-bottom: 24px;"><label class="form-label">Ngày cấp</label><input type="date" class="form-input" id="input-ngay-bc"></div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;"><button class="btn btn-secondary" onclick="dongModal('modal-bang-cap')">Hủy</button><button class="btn btn-primary" onclick="luuBangCap()">Thêm</button></div>
+        </div>
+    </div>
+
+    <!-- MODAL ĐỔI MẬT KHẨU -->
+    <div id="modal-doi-mat-khau" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: var(--bg-card); padding: 24px; border-radius: var(--radius-xl); width: 100%; max-width: 400px; border: 1px solid var(--border-light); box-shadow: var(--shadow-lg);">
+            <h3 style="margin-bottom: 20px; color: var(--text-primary); font-size: 20px; font-weight: 700;">Đổi mật khẩu</h3>
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label">Mật khẩu hiện tại *</label>
+                <input type="password" class="form-input" id="input-pass-cu" placeholder="Nhập mật khẩu đang sử dụng">
             </div>
-            <div class="form-group" style="margin-bottom: 12px;">
-                <label class="form-label">Điểm số / Xếp loại</label>
-                <input type="text" class="form-input" id="input-diem-bc" placeholder="VD: 7.0">
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label">Mật khẩu mới *</label>
+                <input type="password" class="form-input" id="input-pass-moi" placeholder="Ít nhất 6 ký tự">
             </div>
             <div class="form-group" style="margin-bottom: 24px;">
-                <label class="form-label">Ngày cấp</label>
-                <input type="date" class="form-input" id="input-ngay-bc">
+                <label class="form-label">Xác nhận mật khẩu mới *</label>
+                <input type="password" class="form-input" id="input-pass-xac-nhan" placeholder="Nhập lại mật khẩu mới">
             </div>
-            <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                <button class="btn btn-secondary" onclick="dongModal('modal-bang-cap')">Hủy</button>
-                <button class="btn btn-primary" onclick="luuBangCap()">Thêm</button>
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="dongModalDoiMatKhau()">Hủy</button>
+                <button class="btn btn-primary" onclick="xuLyDoiMatKhau()">Lưu thay đổi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL KHIẾU NẠI ĐIỂM UY TÍN -->
+    <div id="modal-khieu-nai-diem" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: var(--bg-card); padding: 32px; border-radius: var(--radius-xl); width: 100%; max-width: 450px; border: 1px solid var(--border-light);">
+            <h2 style="margin-bottom: 8px; color: var(--text-primary);">Khiếu nại điểm uy tín</h2>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">Bạn đang khiếu nại điểm của nhóm <strong id="kn-ten-nhom" style="color: var(--primary);"></strong></p>
+            
+            <input type="hidden" id="kn-ma-nhom">
+            
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label">Lý do khiếu nại *</label>
+                <textarea class="form-textarea" id="kn-ly-do" rows="3" placeholder="VD: Bạn cùng nhóm đánh giá sai sự thật..."></textarea>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 24px;">
+                <label class="form-label">Tải lên ảnh bằng chứng (nếu có)</label>
+                <input type="file" class="form-input" id="kn-file-bang-chung" accept="image/*" style="padding: 8px;">
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Hỗ trợ ảnh JPG, PNG.</p>
+            </div>
+            
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="document.getElementById('modal-khieu-nai-diem').style.display='none'">Hủy</button>
+                <button class="btn btn-primary" onclick="submitKhieuNaiDiem()">Gửi Khiếu Nại</button>
             </div>
         </div>
     </div>

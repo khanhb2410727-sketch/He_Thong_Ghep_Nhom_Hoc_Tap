@@ -8,49 +8,126 @@
     <link rel="stylesheet" href="css/main.css">
     <style>
         body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg-main); background-image: radial-gradient(circle at 20% 80%, rgba(232, 185, 109, 0.05) 0%, transparent 50%); }
-        .auth-card { background: var(--bg-card); padding: 40px; border-radius: var(--radius-xl); box-shadow: var(--shadow-md); border: 2px solid var(--border-light); width: 100%; max-width: 400px; }
-        .auth-title { text-align: center; font-size: 24px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
-        .auth-subtitle { text-align: center; color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; font-style: italic; }
+        .auth-card { background: var(--bg-card); padding: 40px; border-radius: var(--radius-xl); box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid var(--border-light); width: 100%; max-width: 420px; }
+        
+        .auth-title { text-align: center; font-size: 26px; font-weight: 800; color: var(--text-primary); margin-bottom: 32px; }
+        
+        /* CSS CHO TABS ROLE */
+        .role-tabs { display: flex; justify-content: center; gap: 40px; margin-bottom: 28px; border-bottom: 1px solid var(--border-light); }
+        .role-tab { padding: 12px 0; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary); font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.3s ease; }
+        .role-tab:hover { color: var(--text-primary); }
+        .role-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        
         .auth-form { display: flex; flex-direction: column; gap: 16px; }
-        .auth-btn { width: 100%; margin-top: 8px; }
-        .auth-link { text-align: center; font-size: 14px; color: var(--text-secondary); margin-top: 16px; }
-        .auth-link a { color: var(--primary); font-weight: 600; text-decoration: none; }
+        .auth-btn { width: 100%; margin-top: 8px; transition: all 0.3s; }
+        .auth-link { text-align: center; font-size: 14px; color: var(--text-secondary); margin-top: 24px; }
+        .auth-link a { color: var(--primary); font-weight: 600; text-decoration: none; transition: color 0.2s; }
+        .auth-link a:hover { color: var(--primary-hover, #6366f1); }
     </style>
 </head>
 <body>
     <div class="auth-card">
         <div class="auth-title">Đăng nhập</div>
-        <div class="auth-subtitle">Chào mừng bạn trở lại với StudyGroup!</div>
         
+        <!-- CHỌN VAI TRÒ -->
+        <div class="role-tabs">
+            <button type="button" class="role-tab active" id="tab-sv" onclick="chonRole('sinh_vien')">Sinh viên</button>
+            <button type="button" class="role-tab" id="tab-admin" onclick="chonRole('admin')">Quản trị viên</button>
+        </div>
+
         <form class="auth-form" id="form-dang-nhap">
             <div class="form-group">
                 <label class="form-label">Email</label>
                 <input type="email" class="form-input" id="email" placeholder="Nhập email của bạn" required>
             </div>
             <div class="form-group">
-                <label class="form-label">Mật khẩu</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <label class="form-label" style="margin-bottom: 0;">Mật khẩu</label>
+                    <a href="javascript:void(0)" onclick="moModalQuenMatKhau()" style="font-size: 13px; color: var(--primary); text-decoration: none;">Quên mật khẩu?</a>
+                </div>
                 <input type="password" class="form-input" id="mat-khau" placeholder="Nhập mật khẩu" required>
             </div>
             <button type="submit" class="btn btn-primary auth-btn" id="btn-submit">Đăng nhập</button>
         </form>
         
-        <div class="auth-link">
-            Chưa có tài khoản? <a href="dang-ky.html">Đăng ký ngay</a>
+        <!-- KHU VỰC ĐĂNG KÝ (Thêm ID để ẩn hiện) -->
+        <div id="auth-links">
+            <div class="auth-link">
+                Chưa có tài khoản? <a href="dang-ky.html">Đăng ký ngay</a>
+            </div>
+            <div class="auth-link" style="margin-top: 12px;">
+                <a href="index.html" style="color: var(--text-muted); font-size: 13px;">← Quay về trang chủ</a>
+            </div>
         </div>
-        <div class="auth-link" style="margin-top: 8px;">
-            <a href="index.html" style="color: var(--text-muted);">← Quay về trang chủ</a>
+    </div>
+
+    <!-- MODAL QUÊN MẬT KHẨU -->
+    <div id="modal-quen-mat-khau" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: var(--bg-card); padding: 32px; border-radius: var(--radius-xl); width: 100%; max-width: 450px; border: 1px solid var(--border-light); box-shadow: var(--shadow-lg);">
+            <div id="buoc-1-email">
+                <h3 style="margin-bottom: 8px; color: var(--text-primary); font-size: 22px; font-weight: 700;">Khôi phục mật khẩu</h3>
+                <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">Nhập email đăng ký. Hệ thống sẽ gửi mã OTP đến hộp thư.</p>
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label class="form-label">Email đăng ký *</label>
+                    <input type="email" class="form-input" id="quen-email" placeholder="Nhập email của bạn">
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('modal-quen-mat-khau').style.display='none'">Hủy</button>
+                    <button class="btn btn-primary" id="btn-gui-otp" onclick="guiOTP()">Gửi mã OTP</button>
+                </div>
+            </div>
+
+            <div id="buoc-2-otp" style="display: none;">
+                <h3 style="margin-bottom: 8px; color: var(--text-primary); font-size: 22px; font-weight: 700;">Xác thực OTP</h3>
+                <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">Vui lòng mở Mailtrap để lấy mã gửi đến <strong id="hien-thi-email" style="color: var(--primary);"></strong>.</p>
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label class="form-label">Mã OTP (6 chữ số) *</label>
+                    <input type="text" class="form-input" id="quen-otp" placeholder="VD: 123456" maxlength="6">
+                </div>
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label class="form-label">Mật khẩu mới *</label>
+                    <input type="password" class="form-input" id="quen-mat-khau-moi" placeholder="Ít nhất 6 ký tự">
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button class="btn btn-secondary" onclick="quayLaiBuoc1()">Quay lại</button>
+                    <button class="btn btn-primary" id="btn-xac-thuc" onclick="xacThucOTP()">Xác nhận đổi</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script src="js/main.js"></script>
     <script>
+        let currentRole = 'sinh_vien';
+
+        function chonRole(role) {
+            currentRole = role;
+            const tabSv = document.getElementById('tab-sv');
+            const tabAdmin = document.getElementById('tab-admin');
+            const btnSubmit = document.getElementById('btn-submit');
+            const authLinks = document.getElementById('auth-links');
+
+            if (role === 'sinh_vien') {
+                tabSv.classList.add('active');
+                tabAdmin.classList.remove('active');
+                btnSubmit.textContent = 'Đăng nhập Sinh viên';
+                authLinks.style.display = 'block'; // Hiện nút đăng ký
+            } else {
+                tabAdmin.classList.add('active');
+                tabSv.classList.remove('active');
+                btnSubmit.textContent = 'Đăng nhập Quản trị';
+                authLinks.style.display = 'none'; // Ẩn nút đăng ký
+            }
+        }
+
         document.getElementById('form-dang-nhap').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const mat_khau = document.getElementById('mat-khau').value;
             const btn = document.getElementById('btn-submit');
+            const originalText = btn.textContent;
             
-            btn.textContent = 'Đang xử lý...';
+            btn.textContent = 'Đang xử lý...'; 
             btn.disabled = true;
 
             try {
@@ -62,19 +139,95 @@
                 if (data.error) {
                     showToast(data.error, 'error');
                 } else {
+                    const userRole = data.user.loai_tai_khoan;
+                    
+                    if (currentRole === 'sinh_vien' && userRole === 'admin') {
+                        showToast('Tài khoản này là Quản trị viên. Vui lòng chọn tab Quản trị viên!', 'error');
+                        return;
+                    }
+                    if (currentRole === 'admin' && userRole !== 'admin') {
+                        showToast('Tài khoản này không có quyền Quản trị viên!', 'error');
+                        return;
+                    }
+
                     localStorage.setItem('token', data.access_token);
                     localStorage.setItem('user', JSON.stringify(data.user));
                     
-                    showToast('Đăng nhập thành công! Đang vào hệ thống...', 'success');
-                    setTimeout(() => window.location.href = 'index.html', 1500);
+                    showToast('Đăng nhập thành công!', 'success');
+                    
+                    setTimeout(() => {
+                        if (userRole === 'admin') {
+                            window.location.href = 'admin.html'; 
+                        } else {
+                            window.location.href = 'index.html'; 
+                        }
+                    }, 1000);
                 }
             } catch (err) {
                 showToast('Lỗi kết nối máy chủ!', 'error');
             } finally {
-                btn.textContent = 'Đăng nhập';
+                btn.textContent = originalText; 
                 btn.disabled = false;
             }
         });
+
+        // QUÊN MẬT KHẨU
+        function moModalQuenMatKhau() {
+            document.getElementById('buoc-1-email').style.display = 'block';
+            document.getElementById('buoc-2-otp').style.display = 'none';
+            document.getElementById('quen-email').value = '';
+            document.getElementById('quen-otp').value = '';
+            document.getElementById('quen-mat-khau-moi').value = '';
+            document.getElementById('modal-quen-mat-khau').style.display = 'flex';
+        }
+
+        function quayLaiBuoc1() {
+            document.getElementById('buoc-1-email').style.display = 'block';
+            document.getElementById('buoc-2-otp').style.display = 'none';
+        }
+
+        async function guiOTP() {
+            const email = document.getElementById('quen-email').value.trim();
+            if (!email) { showToast('Vui lòng nhập email!', 'error'); return; }
+            const btn = document.getElementById('btn-gui-otp');
+            btn.textContent = 'Đang gửi...'; btn.disabled = true;
+            try {
+                const data = await apiCall('/quen-mat-khau/gui-otp', {
+                    method: 'POST',
+                    body: JSON.stringify({ email: email })
+                });
+                if (data.error) { showToast(data.error, 'error'); } 
+                else {
+                    showToast(data.message, 'success');
+                    document.getElementById('hien-thi-email').textContent = email;
+                    document.getElementById('buoc-1-email').style.display = 'none';
+                    document.getElementById('buoc-2-otp').style.display = 'block';
+                }
+            } catch (err) { showToast('Lỗi khi gửi yêu cầu!', 'error'); } 
+            finally { btn.textContent = 'Gửi mã OTP'; btn.disabled = false; }
+        }
+
+        async function xacThucOTP() {
+            const email = document.getElementById('quen-email').value.trim();
+            const otp = document.getElementById('quen-otp').value.trim();
+            const matKhauMoi = document.getElementById('quen-mat-khau-moi').value;
+            if (!otp || !matKhauMoi) { showToast('Vui lòng nhập đầy đủ thông tin!', 'error'); return; }
+            if (matKhauMoi.length < 6) { showToast('Mật khẩu mới phải từ 6 ký tự!', 'error'); return; }
+            const btn = document.getElementById('btn-xac-thuc');
+            btn.textContent = 'Đang xử lý...'; btn.disabled = true;
+            try {
+                const data = await apiCall('/quen-mat-khau/xac-thuc-otp', {
+                    method: 'POST',
+                    body: JSON.stringify({ email: email, otp: otp, mat_khau_moi: matKhauMoi })
+                });
+                if (data.error) { showToast(data.error, 'error'); } 
+                else {
+                    showToast(data.message, 'success');
+                    document.getElementById('modal-quen-mat-khau').style.display = 'none';
+                }
+            } catch (err) { showToast('Lỗi kết nối server!', 'error'); } 
+            finally { btn.textContent = 'Xác nhận đổi'; btn.disabled = false; }
+        }
     </script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, Float, Date, DateTime, ForeignKey
 from database import Base
+from datetime import datetime
 
 class TaiKhoan(Base):
     __tablename__ = "tai_khoan"
@@ -11,6 +12,8 @@ class TaiKhoan(Base):
     trang_thai = Column(String(20))
     ngay_tao = Column(DateTime)
     lan_dang_nhap_cuoi = Column(DateTime)
+    otp_code = Column(String(10), nullable=True)
+    otp_expiry = Column(DateTime, nullable=True)
 
 class SinhVien(Base):
     __tablename__ = "sinh_vien"
@@ -35,6 +38,8 @@ class MonHoc(Base):
     ma_mon = Column(String(20))
     ten_mon_hoc = Column(String(200))
     so_tin_chi = Column(Integer)
+    nhom_mon_hoc = Column(String(50), default="Chưa xác định")
+    nganh_ap_dung = Column(String(100), default="Tất cả")
 
 class NhomHoc(Base):
     __tablename__ = "nhom_hoc"
@@ -110,6 +115,7 @@ class BaiDangTuyen(Base):
     so_luong_can_tuyen = Column(Integer)
     trang_thai = Column(String(20))
     ngay_tao = Column(DateTime)
+    han_chot = Column(DateTime, nullable=True) # ĐÃ THÊM CỘT NÀY
     yeu_cau_cung = Column(Text, nullable=True)
     yeu_cau_mem = Column(Text, nullable=True)
     yeu_cau_gpa = Column(Float, nullable=True)
@@ -141,3 +147,59 @@ class DanhGia(Base):
     diem_trung_binh = Column(Float)
     nhan_xet = Column(Text)
     ngay_danh_gia = Column(DateTime)
+
+class TinNhan(Base):
+    __tablename__ = "tin_nhan"
+    ma_tin_nhan = Column(Integer, primary_key=True, index=True)
+    ma_nhom = Column(Integer, ForeignKey("nhom_hoc.ma_nhom", ondelete="CASCADE"))
+    nguoi_gui = Column(Integer, ForeignKey("tai_khoan.ma_tai_khoan", ondelete="CASCADE"))
+    noi_dung = Column(Text)
+    ngay_gui = Column(DateTime, default=datetime.now)
+
+class LichHop(Base):
+    __tablename__ = "lich_hop"
+    ma_lich_hop = Column(Integer, primary_key=True, index=True)
+    ma_nhom = Column(Integer, ForeignKey("nhom_hoc.ma_nhom", ondelete="CASCADE"))
+    tieu_de = Column(String(200))
+    thoi_gian_bat_dau = Column(DateTime)
+    thoi_gian_ket_thuc = Column(DateTime)
+    dia_diem = Column(String(255))
+    noi_dung = Column(Text)
+    nguoi_tao = Column(Integer, ForeignKey("tai_khoan.ma_tai_khoan", ondelete="CASCADE"))
+    ngay_tao = Column(DateTime, default=datetime.now)
+
+class Deadline(Base):
+    __tablename__ = "deadline"
+    ma_deadline = Column(Integer, primary_key=True, index=True)
+    ma_nhom = Column(Integer, ForeignKey("nhom_hoc.ma_nhom", ondelete="CASCADE"))
+    tieu_de = Column(String(200))
+    mo_ta = Column(Text)
+    han_chot = Column(DateTime)
+    nguoi_tao = Column(Integer, ForeignKey("tai_khoan.ma_tai_khoan", ondelete="CASCADE"))
+    trang_thai = Column(String(20), default='chua_xong')
+    ngay_tao = Column(DateTime, default=datetime.now)
+
+class BaoCaoViPham(Base):
+    __tablename__ = "bao_cao_vi_pham"
+    ma_bao_cao = Column(Integer, primary_key=True, index=True)
+    nguoi_bao_cao = Column(Integer, ForeignKey("tai_khoan.ma_tai_khoan", ondelete="CASCADE"))
+    loai_doi_tuong = Column(String(50))
+    ma_doi_tuong = Column(Integer)
+    ly_do = Column(Text)
+    bang_chung = Column(Text, nullable=True)
+    trang_thai = Column(String(20), default='cho_xu_ly')
+    ngay_bao_cao = Column(DateTime, default=datetime.now)
+    nguoi_xu_ly = Column(Integer, ForeignKey("tai_khoan.ma_tai_khoan", ondelete="SET NULL"), nullable=True)
+
+
+class YeuCauHoTro(Base):
+    __tablename__ = "yeu_cau_ho_tro"
+    ma_ho_tro = Column(Integer, primary_key=True, index=True)
+    nguoi_gui = Column(Integer, ForeignKey("tai_khoan.ma_tai_khoan", ondelete="CASCADE"))
+    tieu_de = Column(String(200))
+    noi_dung = Column(Text)
+    loai_su_co = Column(String(50), default='Khác') # Cần có dòng này
+    trang_thai = Column(String(20), default='cho_xu_ly')
+    phan_hoi = Column(Text, nullable=True)
+    ngay_gui = Column(DateTime, default=datetime.now)
+    ngay_xu_ly = Column(DateTime, nullable=True)

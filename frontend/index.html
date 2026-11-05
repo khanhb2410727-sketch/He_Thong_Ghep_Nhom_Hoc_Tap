@@ -3,15 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khám phá - StudyGroup</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Hệ thống Ghép nhóm Học tập Thông minh</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/kham_pha.css">
-    <link rel="stylesheet" href="css/book-modal.css">
 </head>
 <body>
     <header class="header">
@@ -29,11 +24,12 @@
 
     <main class="container">
         <section class="hero">
-            <h1>Tìm nhóm học tập</h1>
-            <p>Hệ thống ghép nhóm dựa trên môn học, lịch rảnh và mục tiêu của bạn</p>
+            <h1>Hệ thống Ghép nhóm Học tập</h1>
+            <p>Nền tảng kết nối sinh viên trường Công Nghê Thông Tin và Truyền Thông, tự động tính toán độ tương thích dựa trên lịch rảnh, kỹ năng và mục tiêu học tập.</p>
         </section>
 
         <section class="filters">
+            <!-- HÀNG 1: CÁC Ô NHẬP LIỆU -->
             <div class="filter-row">
                 <div class="form-group">
                     <label class="form-label">Môn học</label>
@@ -49,69 +45,72 @@
                     <label class="form-label">Từ khóa</label>
                     <input type="text" class="form-input" id="filter-mon-hoc" placeholder="Tìm theo tên nhóm...">
                 </div>
-                <button class="btn btn-primary" id="btn-tim-kiem">Tìm nhóm</button>
+            </div>
+            
+            <!-- HÀNG 2: CHỈ CÒN 1 NÚT DUY NHẤT -->
+            <div style="margin-top: 20px; display: flex; justify-content: flex-end; align-items: center; border-top: 1px solid var(--border-light); padding-top: 16px;">
+                <button id="btn-auto-match" class="btn btn-primary" style="min-width: 200px; font-weight: 600;" onclick="handleSearchAndMatch()">
+                    Tìm nhóm phù hợp nhất
+                </button>
             </div>
         </section>
 
         <section class="results">
             <div class="results-header">
-                <h2>Kết quả tìm kiếm</h2>
+                <h2>Danh sách Nhóm đang tuyển</h2>
                 <span class="results-count" id="results-count">0 nhóm</span>
             </div>
             <div class="group-list" id="group-list"></div>
             <div class="empty-state" id="empty-state" style="display: none;">
-                <p>Không tìm thấy nhóm phù hợp</p>
-                <p style="font-size: 14px; margin-top: 8px;">Thử thay đổi từ khóa hoặc bộ lọc</p>
+                <p>Không có nhóm nào đang mở tuyển thành viên.</p>
             </div>
         </section>
     </main>
 
     <footer class="footer">
-        <div class="container"><p>© 2024 StudyGroup. Hệ thống ghép nhóm học tập.</p></div>
+        <div class="container"><p>© 2026 StudyGroup. Nền tảng hỗ trợ học tập nhóm.</p></div>
     </footer>
 
-    <!-- MODAL SÁCH -->
-    <div class="book-modal" id="book-modal" style="display: none;">
-        <div class="book-backdrop" onclick="closeBook()"></div>
-        <div class="book-container" id="book-container">
-            <div class="book-spine"></div>
-            <div class="book-bookmark"></div>
-            <div class="book" id="book">
-                <div class="book-page book-page-left">
-                    <div class="book-page-content">
-                        <h2 class="book-title" id="book-title">Tên nhóm</h2>
-                        <div class="book-type" id="book-type">Loại nhóm</div>
-                        <div class="book-divider"></div>
-                        <div class="book-section"><h3>Mô tả</h3><p id="book-desc">...</p></div>
-                        <div class="book-section"><h3>Yêu cầu tuyển dụng</h3><p id="book-mon-hoc">...</p></div>
-                        <div class="book-section"><h3>Địa điểm / Hình thức</h3><p id="book-de-tai">...</p></div>
-                    </div>
+    <div class="modal-overlay" id="group-modal" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modal-title">Tên nhóm</h2>
+                    <div class="modal-subtitle" id="modal-subtitle">Môn học</div>
                 </div>
-                <div class="book-page book-page-right">
-                    <div class="book-page-content">
-                        <div class="book-section">
-                            <h3>Thành viên (<span id="book-member-count">0/0</span>)</h3>
-                            <div class="book-members" id="book-members"></div>
-                        </div>
-                        <div class="book-section"><h3>Trạng thái</h3><div id="book-status"></div></div>
-                        <div class="book-actions" id="book-actions"></div>
-                    </div>
+                <button class="modal-close" onclick="closeGroupModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3>Mô tả nhóm</h3>
+                    <p id="modal-desc">...</p>
+                </div>
+                <div class="modal-section">
+                    <h3>Yêu cầu tuyển dụng</h3>
+                    <div id="modal-requirements">...</div>
+                </div>
+                <div class="modal-section">
+                    <h3>Thông tin khác</h3>
+                    <div id="modal-other">...</div>
                 </div>
             </div>
+            <div class="modal-footer" id="modal-actions"></div>
         </div>
     </div>
 
-    <!-- MODAL ỨNG TUYỂN -->
-    <div id="modal-ung-tuyen" style="display: none; position: fixed; inset: 0; background: rgba(61, 46, 35, 0.65); backdrop-filter: blur(4px); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
-        <div style="background: var(--bg-card); padding: 32px; border-radius: var(--radius-xl); width: 100%; max-width: 480px; border: 2px solid var(--border-light); box-shadow: var(--shadow-lg); animation: bookOpen 0.3s ease;">
-            <h2 style="margin-bottom: 8px; color: var(--text-primary); font-family: 'Georgia', serif; font-size: 22px;">Gửi lời nhắn ứng tuyển</h2>
-            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 20px; font-style: italic;">Hãy giới thiệu ngắn gọn về bản thân và lý do bạn muốn tham gia nhóm này nhé!</p>
-            
-            <div class="form-group" style="margin-bottom: 24px;">
-                <textarea class="form-textarea" id="ung-tuyen-loi-nhan" rows="4" placeholder="VD: Chào trưởng nhóm, mình là Nam, mình rất hứng thú với đề tài này và có thế mạnh về Python..." style="resize: none;"></textarea>
+    <div class="modal-overlay" id="modal-ung-tuyen" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>Gửi lời nhắn ứng tuyển</h2>
+                <button class="modal-close" onclick="closeModalUngTuyen()">&times;</button>
             </div>
-            
-            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <div class="modal-body">
+                <p style="color: var(--text-secondary); margin-bottom: 16px;">Hãy giới thiệu ngắn gọn về bản thân và lý do bạn muốn tham gia nhóm này.</p>
+                <div class="form-group">
+                    <textarea class="form-textarea" id="ung-tuyen-loi-nhan" rows="4" placeholder="VD: Chào trưởng nhóm, mình rất hứng thú với đề tài này..." style="resize: none;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModalUngTuyen()">Hủy</button>
                 <button class="btn btn-primary" onclick="submitUngTuyen()">Gửi ứng tuyển</button>
             </div>

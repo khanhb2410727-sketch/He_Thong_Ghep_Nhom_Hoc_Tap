@@ -4,16 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đánh giá thành viên - StudyGroup</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/danh-gia.css">
+    <style>
+        /* CSS TÙY CHỈNH TỐI GIẢN CHO TRANG ĐÁNH GIÁ */
+        .eval-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 20px;
+        }
+        
+        .page-header {
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 16px;
+        }
+        
+        .page-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .page-header p {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        /* Phần chọn nhóm gọn gàng */
+        .selector-group {
+            margin-bottom: 24px;
+        }
+
+        .selector-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .selector-group select {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 15px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            appearance: none; /* Xóa mũi tên mặc định của trình duyệt */
+            -webkit-appearance: none;
+            /* Thêm mũi tên tùy chỉnh bằng background image */
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23888%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px top 50%;
+            background-size: 12px auto;
+        }
+
+        .selector-group select:focus {
+            border-color: var(--primary);
+        }
+
+        /* Hướng dẫn dạng text chìm, không khung */
+        .guide-text {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 32px;
+            padding-left: 12px;
+            border-left: 2px solid var(--border);
+        }
+    </style>
 </head>
 <body>
-    <!-- HEADER -->
     <header class="header">
         <div class="container">
             <div class="logo"><a href="index.html">StudyGroup</a></div>
@@ -27,118 +97,112 @@
         </div>
     </header>
 
-    <main class="container">
+    <main class="eval-container">
         <div class="page-header">
             <h1>Đánh giá thành viên</h1>
-            <p class="page-subtitle">Đánh giá đóng góp của các thành viên trong nhóm</p>
+            <p>Chỉ những nhóm đã kết thúc hoạt động mới có thể đánh giá.</p>
         </div>
 
-        <div class="nhom-selector">
-            <label class="nhom-selector-label">Chọn nhóm để đánh giá</label>
-            <select class="nhom-selector-select" id="chon-nhom" onchange="doiNhom()">
-                <option value="">-- Chọn nhóm --</option>
-                <option value="1">Nhóm AI - Đồ án Chatbot</option>
-                <option value="2">Nhóm ôn thi Giải tích 2</option>
+        <!-- KHỐI CHỌN NHÓM -->
+        <div class="selector-group">
+            <label>Chọn nhóm đã kết thúc để đánh giá</label>
+            <select id="chon-nhom" onchange="doiNhom()">
+                <option value="">-- Đang tải danh sách --</option>
             </select>
         </div>
 
-        <div class="huong-dan">
-            <h3 class="huong-dan-title">Hướng dẫn đánh giá</h3>
-            <p class="huong-dan-text">Đánh giá của bạn sẽ được ẩn danh. Hãy đánh giá khách quan dựa trên đóng góp thực tế của thành viên đó trong suốt quá trình làm việc nhóm.</p>
+        <!-- HƯỚNG DẪN DẠNG TEXT GỌN -->
+        <div class="guide-text">
+            Đánh giá của bạn sẽ được ẩn danh. Hãy đánh giá khách quan dựa trên đóng góp thực tế của thành viên đó trong suốt quá trình làm việc nhóm.
         </div>
 
         <!-- Nơi JS render danh sách thành viên -->
-        <div class="thanh-vien-list" id="thanh-vien-list"></div>
+        <div class="thanh-vien-list" id="list-nhom-danh-gia"></div>
 
-        <div class="danh-gia-actions" id="danh-gia-actions" style="display: none;">
-            <button class="btn btn-secondary" onclick="huyDanhGia()">Hủy</button>
-            <button class="btn btn-primary" onclick="guiDanhGia()">Gửi đánh giá</button>
+        <!-- Trạng thái trống -->
+        <div class="empty-state" id="empty-state-page" style="display: none; text-align: center; padding: 40px 20px; color: var(--text-muted); background: var(--bg-card); border-radius: var(--radius-md);">
+            <p style="font-size: 15px;">Bạn chưa có nhóm nào kết thúc hoạt động để đánh giá.</p>
         </div>
     </main>
 
     <footer class="footer">
-        <div class="container"><p>© 2024 StudyGroup. Hệ thống ghép nhóm học tập.</p></div>
+        <div class="container"><p>© 2026 StudyGroup. Hệ thống ghép nhóm học tập.</p></div>
     </footer>
 
-    <!-- Gọi main.js để xử lý header -->
-    <script src="js/main.js"></script>
-    
-    <!-- Script tạm để render giao diện -->
-    <script>
-        const TIEU_CHI = [
-            { key: 'thaiDo', ten: 'Thái độ', desc: 'Tinh thần học tập, tham gia tích cực' },
-            { key: 'dongGop', ten: 'Đóng góp', desc: 'Chất lượng và khối lượng công việc' },
-            { key: 'giaoTiep', ten: 'Giao tiếp', desc: 'Phối hợp, trao đổi trong nhóm' },
-            { key: 'dungHan', ten: 'Đúng hạn', desc: 'Hoàn thành task đúng thời gian' }
-        ];
-        
-        const MOCK_TV = {
-            '1': [
-                { maTaiKhoan: 2, ten: 'Trần Thị Bình', vaiTro: 'Phó nhóm', avatar: 'B' },
-                { maTaiKhoan: 3, ten: 'Lê Văn Cường', vaiTro: 'Thành viên', avatar: 'C' }
-            ]
-        };
-
-        function doiNhom() {
-            const maNhom = document.getElementById('chon-nhom').value;
-            const list = document.getElementById('thanh-vien-list');
-            const actions = document.getElementById('danh-gia-actions');
+    <!-- MODAL ĐÁNH GIÁ (Giữ nguyên giao diện modal của bạn) -->
+    <div id="modal-danh-gia" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(6px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: var(--bg-card); border-radius: var(--radius-xl); width: 100%; max-width: 600px; max-height: 90vh; display: flex; flex-direction: column; border: 1px solid var(--border-light); box-shadow: var(--shadow-lg); animation: modalFadeIn 0.3s ease;">
             
-            if (!maNhom) {
-                list.innerHTML = `
-                    <div class="empty-danh-gia">
-                        <div class="empty-danh-gia-title">Chưa chọn nhóm</div>
-                        <div class="empty-danh-gia-desc">Vui lòng chọn nhóm ở trên để bắt đầu đánh giá thành viên.</div>
-                    </div>
-                `;
-                actions.style.display = 'none';
-                return;
-            }
+            <div style="padding: 24px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h2 style="font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">Đánh giá thành viên</h2>
+                    <div style="font-size: 14px; color: var(--primary); font-weight: 500;" id="modal-ten-nguoi-duoc-dg">Đánh giá: ...</div>
+                </div>
+                <button onclick="closeModal()" style="background: transparent; border: none; color: var(--text-secondary); font-size: 24px; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
 
-            const members = MOCK_TV[maNhom] || [];
-            list.innerHTML = members.map(tv => `
-                <div class="thanh-vien-card">
-                    <div class="tv-header">
-                        <div class="tv-avatar">${tv.avatar}</div>
-                        <div class="tv-info">
-                            <div class="tv-name">${tv.ten}</div>
-                            <div class="tv-role">${tv.vaiTro}</div>
+            <div style="padding: 24px; overflow-y: auto; flex: 1;">
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <!-- Thái độ -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border-light); padding-bottom: 16px;">
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-primary);">Thái độ</div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">Tinh thần học tập, tham gia tích cực</div>
+                        </div>
+                        <div class="star-rating" data-tieu-chi="thai-do" style="display: flex; gap: 8px; font-size: 24px; cursor: pointer; color: var(--text-muted);">
+                            <span class="star" data-value="1">★</span><span class="star" data-value="2">★</span><span class="star" data-value="3">★</span><span class="star" data-value="4">★</span><span class="star" data-value="5">★</span>
                         </div>
                     </div>
-                    
-                    <div class="tieu-chi-list">
-                        ${TIEU_CHI.map(tc => `
-                            <div class="tieu-chi">
-                                <div>
-                                    <div class="tieu-chi-name">${tc.ten}</div>
-                                    <div class="tieu-chi-desc">${tc.desc}</div>
-                                </div>
-                                <div class="star-rating">
-                                    ${[1, 2, 3, 4, 5].map(n => `<span class="star" onclick="this.parentNode.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('active', i<${n}))">★</span>`).join('')}
-                                </div>
-                                <div class="tieu-chi-score">—</div>
-                            </div>
-                        `).join('')}
+
+                    <!-- Đóng góp -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border-light); padding-bottom: 16px;">
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-primary);">Đóng góp</div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">Chất lượng và khối lượng công việc</div>
+                        </div>
+                        <div class="star-rating" data-tieu-chi="dong-gop" style="display: flex; gap: 8px; font-size: 24px; cursor: pointer; color: var(--text-muted);">
+                            <span class="star" data-value="1">★</span><span class="star" data-value="2">★</span><span class="star" data-value="3">★</span><span class="star" data-value="4">★</span><span class="star" data-value="5">★</span>
+                        </div>
                     </div>
-                    
-                    <div class="nhan-xet-section">
-                        <label class="nhan-xet-label">Nhận xét (tùy chọn)</label>
-                        <textarea class="nhan-xet-input" placeholder="Nhận xét của bạn về thái độ và đóng góp của thành viên này..."></textarea>
+
+                    <!-- Giao tiếp -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border-light); padding-bottom: 16px;">
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-primary);">Giao tiếp</div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">Phối hợp, trao đổi trong nhóm</div>
+                        </div>
+                        <div class="star-rating" data-tieu-chi="giao-tiep" style="display: flex; gap: 8px; font-size: 24px; cursor: pointer; color: var(--text-muted);">
+                            <span class="star" data-value="1">★</span><span class="star" data-value="2">★</span><span class="star" data-value="3">★</span><span class="star" data-value="4">★</span><span class="star" data-value="5">★</span>
+                        </div>
+                    </div>
+
+                    <!-- Đúng hạn -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border-light); padding-bottom: 16px;">
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-primary);">Đúng hạn</div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">Hoàn thành task đúng thời gian</div>
+                        </div>
+                        <div class="star-rating" data-tieu-chi="dung-han" style="display: flex; gap: 8px; font-size: 24px; cursor: pointer; color: var(--text-muted);">
+                            <span class="star" data-value="1">★</span><span class="star" data-value="2">★</span><span class="star" data-value="3">★</span><span class="star" data-value="4">★</span><span class="star" data-value="5">★</span>
+                        </div>
                     </div>
                 </div>
-            `).join('');
-            
-            actions.style.display = 'flex';
-        }
 
-        function huyDanhGia() {
-            document.getElementById('chon-nhom').value = '';
-            doiNhom();
-        }
+                <div style="margin-top: 24px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Nhận xét thêm (Tùy chọn)</label>
+                    <textarea id="nhan-xet" style="width: 100%; padding: 12px; background: var(--bg-main); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--text-primary); font-family: inherit; resize: vertical; min-height: 80px;" placeholder="Nhận xét về thái độ và đóng góp của thành viên này..."></textarea>
+                    <div style="text-align: right; font-size: 12px; color: var(--text-muted); margin-top: 4px;"><span id="char-count">0</span>/500</div>
+                </div>
+            </div>
 
-        function guiDanhGia() {
-            showToast('Đã gửi đánh giá thành công!', 'success');
-        }
-    </script>
+            <div style="padding: 20px 24px; border-top: 1px solid var(--border-light); display: flex; justify-content: flex-end; gap: 12px; background: var(--bg-main); border-bottom-left-radius: var(--radius-xl); border-bottom-right-radius: var(--radius-xl);">
+                <button class="btn btn-secondary" onclick="closeModal()">Hủy</button>
+                <button class="btn btn-primary" onclick="submitDanhGia()">Gửi đánh giá</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/danh-gia.js"></script>
 </body>
 </html>

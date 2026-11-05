@@ -1,233 +1,130 @@
-// ============================================
-// TRANG ĐÁNH GIÁ
-// ============================================
-
-// ===== MOCK DATA =====
-const MOCK_NHOM_CAN_DANH_GIA = [
-    {
-        maNhom: 1,
-        tenNhom: 'Nhóm AI - Đồ án Chatbot',
-        tenLoai: 'Đồ án môn học',
-        kyDanhGia: 'Kết thúc học kỳ 1/2024',
-        ngayBatDau: '2024-10-06',
-        hanDanhGia: '2024-10-20T23:59:00',
-        trangThaiKy: 'dang-danh-gia',
-        thanhVien: [
-            {
-                maTaiKhoan: 2,
-                hoTen: 'Trần Thị Bình',
-                vaiTro: 'Thành viên',
-                ngayThamGia: '2024-09-01',
-                daDanhGia: true
-            },
-            {
-                maTaiKhoan: 3,
-                hoTen: 'Lê Văn Cường',
-                vaiTro: 'Thành viên',
-                ngayThamGia: '2024-09-01',
-                daDanhGia: false
-            },
-            {
-                maTaiKhoan: 4,
-                hoTen: 'Phạm Thị Dung',
-                vaiTro: 'Thành viên',
-                ngayThamGia: '2024-09-15',
-                daDanhGia: false
-            }
-        ]
-    }
-];
-
-// ===== STATE =====
+let danhSachNhom = [];
 let nhomDangDanhGia = null;
-let nguoiDangDanhGia = null;
-let diemDanhGia = {
-    'thai-do': 0,
-    'dong-gop': 0,
-    'giao-tiep': 0,
-    'dung-han': 0
-};
+let diemDanhGia = { 'thai-do': 0, 'dong-gop': 0, 'giao-tiep': 0, 'dung-han': 0 };
 
-// ============================================
-// INIT
-// ============================================
-
-document.addEventListener('DOMContentLoaded', () => {
-    loadDanhSachDanhGia();
+document.addEventListener('DOMContentLoaded', async () => {
+    if (!localStorage.getItem('token')) { window.location.href = 'dang-nhap.html'; return; }
+    await loadDanhSachNhom();
     setupStarRating();
     setupCharCount();
-    
-    // ESC đóng modal
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeModal();
-    });
 });
 
-// ============================================
-// LOAD DANH SÁCH
-// ============================================
+async function loadDanhSachNhom() {
+    const selector = document.getElementById('chon-nhom');
+    const emptyState = document.getElementById('empty-state-page');
+    const listContainer = document.getElementById('list-nhom-danh-gia');
+    
+    try {
+        const data = await apiCall('/nhom/cua-toi', { method: 'GET' });
+        danhSachNhom = data.danhSach || [];
+        
+        // CHỈ LẤY NHỮNG NHÓM ĐÃ GIẢI TÁN
+        const nhomDaKetThuc = danhSachNhom.filter(n => n.trangThai === 'da_giai_tan');
+        
+        if (nhomDaKetThuc.length === 0) {
+            selector.innerHTML = '<option value="">-- Chưa có nhóm nào kết thúc --</option>';
+            if (emptyState) emptyState.style.display = 'block';
+            listContainer.innerHTML = '';
+            return;
+        }
 
-function loadDanhSachDanhGia() {
-    const container = document.getElementById('list-nhom-danh-gia');
+        selector.innerHTML = '<option value="">-- Chọn nhóm để đánh giá --</option>' + 
+            nhomDaKetThuc.map(n => `<option value="${n.maNhom}">${n.tenNhom}</option>`).join('');
+            
+    } catch (err) {
+        console.error(err);
+        selector.innerHTML = '<option value="">Lỗi tải danh sách nhóm</option>';
+    }
+}
+
+async function doiNhom() {
+    const maNhom = parseInt(document.getElementById('chon-nhom').value);
+    const list = document.getElementById('list-nhom-danh-gia');
     const emptyState = document.getElementById('empty-state-page');
     
-    if (MOCK_NHOM_CAN_DANH_GIA.length === 0) {
-        container.innerHTML = '';
-        emptyState.style.display = 'block';
+    if (!maNhom) {
+        list.innerHTML = '';
+        if (emptyState) emptyState.style.display = 'block';
         return;
     }
     
-    emptyState.style.display = 'none';
-    container.innerHTML = MOCK_NHOM_CAN_DANH_GIA
-        .map(nhom => renderNhomDanhGia(nhom))
-        .join('');
-}
+    list.innerHTML = '<p style="text-align: center; padding: 20px; color: var(--text-muted);">Đang tải thành viên...</p>';
+    if (emptyState) emptyState.style.display = 'none';
 
-// ============================================
-// RENDER NHÓM ĐÁNH GIÁ
-// ============================================
+    try {
+        const data = await apiCall(`/nhom/${maNhom}/thanh-vien-danh-gia`, { method: 'GET' });
+        const nhom = danhSachNhom.find(n => n.maNhom === maNhom);
+        const danhSachTV = data.danhSach || [];
 
-function renderNhomDanhGia(nhom) {
-    const soDaDanhGia = nhom.thanhVien.filter(tv => tv.daDanhGia).length;
-    const tongThanhVien = nhom.thanhVien.length;
-    const phanTram = Math.round((soDaDanhGia / tongThanhVien) * 100);
-    
-    const statusMap = {
-        'dang-danh-gia': { text: 'Đang đánh giá', class: 'dang-danh-gia' },
-        'da-hoan-thanh': { text: 'Đã hoàn thành', class: 'da-hoan-thanh' },
-        'qua-han': { text: 'Quá hạn', class: 'qua-han' }
-    };
-    const status = statusMap[nhom.trangThaiKy] || statusMap['dang-danh-gia'];
-    
-    return `
-        <div class="nhom-danh-gia">
-            <!-- Header nhóm -->
-            <div class="nhom-danh-gia-header">
-                <div>
-                    <h2 class="nhom-danh-gia-title">${nhom.tenNhom}</h2>
-                    <div class="nhom-danh-gia-meta">
-                        <div class="nhom-danh-gia-meta-item">
-                            Loại: <strong>${nhom.tenLoai}</strong>
-                        </div>
-                        <div class="nhom-danh-gia-meta-item">
-                            Kỳ đánh giá: <strong>${nhom.kyDanhGia}</strong>
-                        </div>
-                        <div class="nhom-danh-gia-meta-item">
-                            Hạn: <strong>${formatDateTime(nhom.hanDanhGia)}</strong>
-                        </div>
+        if (danhSachTV.length === 0) {
+            list.innerHTML = '<p style="text-align: center; padding: 20px; color: var(--text-muted);">Nhóm không có thành viên nào khác.</p>';
+            return;
+        }
+
+        const soDaDanhGia = danhSachTV.filter(tv => tv.daDanhGia).length;
+        const tongThanhVien = danhSachTV.length;
+        const phanTram = Math.round((soDaDanhGia / tongThanhVien) * 100);
+
+        list.innerHTML = `
+            <div class="nhom-danh-gia" style="background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-xl); padding: 24px;">
+                <div style="margin-bottom: 24px;">
+                    <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">${nhom.tenNhom}</h2>
+                    <div style="font-size: 14px; color: var(--text-secondary);">Môn: ${nhom.tenMonHoc || '—'} | Trạng thái: Đã kết thúc</div>
+                </div>
+                
+                <div style="margin-bottom: 24px; background: var(--bg-main); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; font-weight: 500;">
+                        <span>Tiến độ đánh giá của bạn</span>
+                        <span>${soDaDanhGia}/${tongThanhVien} thành viên</span>
+                    </div>
+                    <div style="width: 100%; height: 8px; background: var(--bg-hover); border-radius: 4px; overflow: hidden;">
+                        <div style="width: ${phanTram}%; height: 100%; background: var(--primary); transition: width 0.3s;"></div>
                     </div>
                 </div>
-                <span class="ky-danh-gia-status ${status.class}">${status.text}</span>
-            </div>
-            
-            <!-- Tiến độ -->
-            <div class="tien-do-wrapper">
-                <div class="tien-do-header">
-                    <span class="tien-do-label">Tiến độ đánh giá của bạn</span>
-                    <span class="tien-do-value">${soDaDanhGia}/${tongThanhVien} thành viên</span>
+                
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    ${danhSachTV.map(tv => `
+                        <div style="background: var(--bg-main); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 16px; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-hover); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold;">${tv.hoTen.split(' ').pop().charAt(0)}</div>
+                                <div>
+                                    <div style="font-weight: 600; color: var(--text-primary); font-size: 16px;">${tv.hoTen}</div>
+                                    <div style="font-size: 13px; color: var(--text-secondary);">${tv.vaiTro}</div>
+                                </div>
+                            </div>
+                            ${tv.daDanhGia 
+                                ? `<span style="color: var(--secondary); font-weight: 600; font-size: 14px; padding: 8px 12px; background: rgba(16, 185, 129, 0.1); border-radius: var(--radius-md);">Đã đánh giá</span>`
+                                : `<button class="btn btn-primary btn-sm" onclick="openModal(${maNhom}, ${tv.maTaiKhoan}, '${tv.hoTen}')">Đánh giá ngay</button>`
+                            }
+                        </div>
+                    `).join('')}
                 </div>
-                <div class="tien-do-bar">
-                    <div class="tien-do-fill" style="width: ${phanTram}%"></div>
-                </div>
-                <div class="tien-do-note">
-                    ${soDaDanhGia === tongThanhVien 
-                        ? 'Bạn đã hoàn thành đánh giá tất cả thành viên!' 
-                        : `Còn ${tongThanhVien - soDaDanhGia} thành viên cần đánh giá`}
-                </div>
             </div>
-            
-            <!-- Danh sách thành viên -->
-            <div class="thanh-vien-list">
-                ${nhom.thanhVien.map(tv => renderThanhVienItem(tv, nhom.maNhom)).join('')}
-            </div>
-        </div>
-    `;
+        `;
+    } catch (err) {
+        console.error(err);
+        list.innerHTML = '<p style="color: red; text-align: center; padding: 20px;">Lỗi tải dữ liệu thành viên!</p>';
+    }
 }
 
-function renderThanhVienItem(tv, maNhom) {
-    const chuCaiDau = tv.hoTen.split(' ').pop().charAt(0);
+function openModal(maNhom, maTaiKhoan, hoTen) {
+    nhomDangDanhGia = maNhom;
+    document.getElementById('modal-ten-nguoi-duoc-dg').textContent = `Đánh giá: ${hoTen}`;
     
-    return `
-        <div class="thanh-vien-item ${tv.daDanhGia ? 'da-danh-gia' : ''}">
-            <div class="thanh-vien-info">
-                <div class="thanh-vien-avatar">${chuCaiDau}</div>
-                <div class="thanh-vien-details">
-                    <div class="thanh-vien-name">${tv.hoTen}</div>
-                    <div class="thanh-vien-role">${tv.vaiTro}</div>
-                    <div class="thanh-vien-date">Tham gia ${formatDate(tv.ngayThamGia)}</div>
-                </div>
-            </div>
-            
-            <div class="thanh-vien-actions">
-                ${tv.daDanhGia 
-                    ? `<span class="da-danh-gia-badge">Đã đánh giá</span>`
-                    : `<button class="btn btn-primary btn-sm" 
-                               onclick="openModal(${maNhom}, ${tv.maTaiKhoan})">
-                            Đánh giá ngay
-                       </button>`
-                }
-            </div>
-        </div>
-    `;
-}
-
-// ============================================
-// MODAL
-// ============================================
-
-function openModal(maNhom, maTaiKhoan) {
-    const nhom = MOCK_NHOM_CAN_DANH_GIA.find(n => n.maNhom === maNhom);
-    const thanhVien = nhom?.thanhVien.find(tv => tv.maTaiKhoan === maTaiKhoan);
-    
-    if (!nhom || !thanhVien) return;
-    
-    nhomDangDanhGia = nhom;
-    nguoiDangDanhGia = thanhVien;
-    
-    // Reset điểm
-    diemDanhGia = {
-        'thai-do': 0,
-        'dong-gop': 0,
-        'giao-tiep': 0,
-        'dung-han': 0
-    };
-    
-    // Reset stars
-    document.querySelectorAll('.star-rating').forEach(rating => {
-        rating.querySelectorAll('.star').forEach(star => {
-            star.classList.remove('active');
-        });
-    });
-    
-    // Reset nhận xét
+    diemDanhGia = { 'thai-do': 0, 'dong-gop': 0, 'giao-tiep': 0, 'dung-han': 0 };
+    document.querySelectorAll('.star').forEach(s => { s.classList.remove('active'); s.style.color = ''; });
     document.getElementById('nhan-xet').value = '';
     document.getElementById('char-count').textContent = '0';
-    document.getElementById('an-danh').checked = true;
     
-    // Điền thông tin
-    document.getElementById('modal-nguoi-name').textContent = thanhVien.hoTen;
-    document.getElementById('modal-nguoi-role').textContent = thanhVien.vaiTro;
-    document.getElementById('modal-ten-nguoi-duoc-dg').textContent = 
-        `Đánh giá: ${thanhVien.hoTen}`;
-    
-    // Hiện modal
+    document.getElementById('modal-danh-gia').setAttribute('data-ma-tai-khoan', maTaiKhoan);
     document.getElementById('modal-danh-gia').style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
 
 function closeModal() {
-    const modal = document.getElementById('modal-danh-gia');
-    if (!modal) return;
-    
-    modal.style.display = 'none';
+    document.getElementById('modal-danh-gia').style.display = 'none';
     document.body.style.overflow = '';
-    nhomDangDanhGia = null;
-    nguoiDangDanhGia = null;
 }
-
-// ============================================
-// STAR RATING
-// ============================================
 
 function setupStarRating() {
     document.querySelectorAll('.star-rating').forEach(rating => {
@@ -235,184 +132,69 @@ function setupStarRating() {
         const stars = rating.querySelectorAll('.star');
         
         stars.forEach(star => {
-            // Hover
-            star.addEventListener('mouseenter', () => {
-                const value = parseInt(star.dataset.value);
-                stars.forEach((s, index) => {
-                    if (index < value) {
-                        s.style.color = 'var(--secondary)';
-                        s.style.borderColor = 'var(--secondary)';
-                    } else {
-                        s.style.color = '';
-                        s.style.borderColor = '';
-                    }
-                });
-            });
-            
-            // Click
             star.addEventListener('click', () => {
                 const value = parseInt(star.dataset.value);
                 diemDanhGia[tieuChi] = value;
-                
-                // Update active
                 stars.forEach((s, index) => {
-                    s.classList.toggle('active', index < value);
-                });
-                
-                // Reset hover effect
-                stars.forEach(s => {
-                    s.style.color = '';
-                    s.style.borderColor = '';
+                    if (index < value) { s.classList.add('active'); s.style.color = 'var(--secondary)'; }
+                    else { s.classList.remove('active'); s.style.color = ''; }
                 });
             });
+            star.addEventListener('mouseenter', () => {
+                const value = parseInt(star.dataset.value);
+                stars.forEach((s, index) => s.style.color = index < value ? 'var(--secondary)' : '');
+            });
         });
-        
-        // Mouse leave
         rating.addEventListener('mouseleave', () => {
-            stars.forEach(s => {
-                s.style.color = '';
-                s.style.borderColor = '';
+            stars.forEach((s, index) => {
+                const value = parseInt(s.dataset.value);
+                s.style.color = (diemDanhGia[tieuChi] >= value) ? 'var(--secondary)' : '';
             });
         });
     });
 }
-
-// ============================================
-// CHAR COUNT
-// ============================================
 
 function setupCharCount() {
     const textarea = document.getElementById('nhan-xet');
-    const counter = document.getElementById('char-count');
-    
+    if (!textarea) return;
     textarea.addEventListener('input', () => {
-        const length = textarea.value.length;
-        counter.textContent = length;
-        
-        // Đổi màu khi gần đạt giới hạn
-        counter.parentElement.classList.remove('warning', 'danger');
-        if (length >= 450) {
-            counter.parentElement.classList.add('danger');
-        } else if (length >= 350) {
-            counter.parentElement.classList.add('warning');
-        }
+        document.getElementById('char-count').textContent = textarea.value.length;
     });
 }
 
-// ============================================
-// GỬI ĐÁNH GIÁ
-// ============================================
-
-function guiDanhGia() {
-    // Validate
-    const thieuTieuChi = Object.entries(diemDanhGia)
-        .filter(([key, value]) => value === 0)
-        .map(([key]) => getTieuChiText(key));
+async function submitDanhGia() {
+    const maNguoiDuocDanhGia = parseInt(document.getElementById('modal-danh-gia').getAttribute('data-ma-tai-khoan'));
     
-    if (thieuTieuChi.length > 0) {
-        alert(`Vui lòng đánh giá các tiêu chí sau:\n• ${thieuTieuChi.join('\n• ')}`);
+    if (Object.values(diemDanhGia).includes(0)) {
+        showToast('Vui lòng đánh giá đầy đủ tất cả các tiêu chí (1-5 sao)!', 'error');
         return;
     }
-    
-    const nhanXet = document.getElementById('nhan-xet').value.trim();
-    const anDanh = document.getElementById('an-danh').checked;
-    
-    // Giả lập gửi API
-    const data = {
-        maNhom: nhomDangDanhGia.maNhom,
-        maNguoiDanhGia: 1, // Nguyễn Văn An
-        maNguoiDuocDanhGia: nguoiDangDanhGia.maTaiKhoan,
+
+    const payload = {
+        maNhom: nhomDangDanhGia,
+        maNguoiDuocDanhGia: maNguoiDuocDanhGia,
         diemThaiDo: diemDanhGia['thai-do'],
         diemDongGop: diemDanhGia['dong-gop'],
         diemGiaoTiep: diemDanhGia['giao-tiep'],
         diemDungHan: diemDanhGia['dung-han'],
-        nhanXet: nhanXet,
-        anDanh: anDanh
+        nhanXet: document.getElementById('nhan-xet').value.trim()
     };
-    
-    console.log('Gửi đánh giá:', data);
-    
-    // Cập nhật state
-    nguoiDangDanhGia.daDanhGia = true;
-    
-    // Đóng modal
-    closeModal();
-    
-    // Reload danh sách
-    loadDanhSachDanhGia();
-    
-    // Thông báo
-    setTimeout(() => {
-        showToast(`Đã gửi đánh giá cho ${nguoiDangDanhGia.hoTen}`, 'success');
-    }, 100);
-}
 
-// ============================================
-// HELPER
-// ============================================
+    const btn = document.querySelector('#modal-danh-gia .btn-primary');
+    btn.textContent = 'Đang gửi...'; btn.disabled = true;
 
-function getTieuChiText(key) {
-    const map = {
-        'thai-do': 'Thái độ',
-        'dong-gop': 'Mức độ đóng góp',
-        'giao-tiep': 'Giao tiếp',
-        'dung-han': 'Đúng hạn'
-    };
-    return map[key] || key;
-}
-
-function formatDate(dateStr) {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-}
-
-function formatDateTime(dateStr) {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    const date = formatDate(dateStr);
-    const time = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-    return `${date} ${time}`;
-}
-
-// Toast notification
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.style.cssText = `
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        padding: 14px 20px;
-        background: ${type === 'success' ? '#5B8C5A' : '#B85045'};
-        color: white;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 14px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        z-index: 9999;
-        animation: slideInRight 0.3s ease;
-        font-family: 'Inter', sans-serif;
-    `;
-    toast.textContent = message;
-    
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.style.animation = 'slideOutRight 0.3s ease';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-// Thêm animation
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideInRight {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
+    try {
+        const data = await apiCall('/danh-gia', { method: 'POST', body: JSON.stringify(payload) });
+        if (data.error) {
+            showToast(data.error, 'error');
+        } else {
+            showToast('Gửi đánh giá thành công!', 'success');
+            closeModal();
+            doiNhom(); 
+        }
+    } catch (err) {
+        showToast(err.message || 'Lỗi khi gửi đánh giá!', 'error');
+    } finally {
+        btn.textContent = 'Gửi đánh giá'; btn.disabled = false;
     }
-    @keyframes slideOutRight {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-`;
-document.head.appendChild(style);
+}
